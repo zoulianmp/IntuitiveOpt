@@ -267,7 +267,7 @@ function import_button_Callback(hObject, eventdata, handles)
 patient_listbox = get(handles.patient_listbox,'String');
 ctseries_listbox = get(handles.ctseries_listbox,'String');
 rtplan_listbox = get(handles.rtplan_listbox,'String');
-doseseries_listbox = get(handles.rtplan_listbox,'String');
+doseseries_listbox = get(handles.doseseries_listbox,'String');
 if ~isempty(patient_listbox)
     selected_patient = patient_listbox(get(handles.patient_listbox,'Value'));
 end
