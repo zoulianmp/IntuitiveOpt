@@ -88,7 +88,7 @@ end
 
 if strcmp(pln.radiationMode,'protons') || strcmp(pln.radiationMode,'carbon')
       
-    availableEnergies = [ .data.energy];
+    availableEnergies = [machine.data.energy];
     availablePeakPos  = [machine.data.peakPos] + [machine.data.offset];
     
     if sum(availablePeakPos<0)>0
