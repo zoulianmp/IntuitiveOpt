@@ -723,6 +723,8 @@ try
     stf = matRad_generateStf(evalin('base','ct'),...
                                      evalin('base','cst'),...
                                      evalin('base','pln'));
+                                 
+   
     assignin('base','stf',stf);
 catch ME
     handles = showError(handles,{'CalcDoseCallback: Error in steering file generation!',ME.message}); 
@@ -1302,6 +1304,7 @@ try
 
         switch choice
             case 'Cancel'
+                set(InterfaceObj,'Enable','on');
                 return
             case 'Calculate dij again and optimize'
                 handles.DijCalcWarning = false;
