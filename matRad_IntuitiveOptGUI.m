@@ -3300,32 +3300,33 @@ try
         addpath(fullfile(matRadRootDir,'IO'))
     end
     
-    %call the gui
-    uiwait(matRad_importGUI);
+    %call the uigetfile,import aim file
+    [DataFile basePath ] = uigetfile('*.mat');
+    IntuitivOptBaseDataFile = fullfile(basePath,DataFile);
     
-    
-    
-    
-    
-    
+    fprintf('Begin loading the base mat file for Intuitive Opt ........ \n');
+    load(IntuitivOptBaseDataFile);
+    fprintf('End of loading mat file for Intuitive Opt ........ \n');
     
     
     
     
     %Check if we have the variables in the workspace
-    if evalin('base','exist(''cst'',''var'')') == 1 && evalin('base','exist(''ct'',''var'')') == 1
+    %if evalin('global','exist(''cst'',''var'')') == 1 && evalin('global','exist(''ct'',''var'')') == 1
+     if exist('cst','var')  &&  exist('ct','var') 
+        
+        assignin('base','ct',ct);
+        assignin('base','cst',cst);
+        
         cst = evalin('base','cst');
         ct = evalin('base','ct');
         setCstTable(handles,cst);
         handles.TableChanged = false;
         set(handles.popupTypeOfPlot,'Value',1);
         % precompute contours 
-        cst = precomputeContours(ct,cst);
-    
-        assignin('base','ct',ct);
-        assignin('base','cst',cst);
+        %cst = precomputeContours(ct,cst);
         
-        if evalin('base','exist(''pln'',''var'')')
+        if exist('pln','var')
             assignin('base','pln',pln);
             setPln(handles);
         else
@@ -3333,7 +3334,14 @@ try
             setPln(handles);
         end
         handles.State = 1;
-    end
+     end
+    
+      if exist('dij','var')  
+          assignin('base','dij',dij); 
+          
+      end
+     
+     
     
     % set slice slider
     handles.plane = get(handles.popupPlane,'value');
@@ -3363,7 +3371,7 @@ try
     UpdatePlot(handles);
     handles.rememberCurrAxes = true;
 catch
-   handles = showError(handles,'Binary Patient Import: Could not import data');
+   handles = showError(handles,'Binary Patient Import: Could not import Intuitive Opt Base data');
    UpdateState(handles);
 end
 
@@ -3804,7 +3812,7 @@ function btnSaveBDataforIntOpt_Callback(hObject, eventdata, handles)
 currPath = fileparts(mfilename('fullpath'));% get current path
 
 FilePath = uigetdir(currPath);
-handles.DijCalcWarning = true;   
+%handles.DijCalcWarning = true;   
 
 % if a critical change to the cst has been made which affects the dij matrix
 if handles.DijCalcWarning == true
@@ -3838,13 +3846,13 @@ dij = evalin('base','dij');
 AllVarNames = evalin('base','who');
 RefVarNames = {'ct','cst','pln','stf','dij'};
 
-FileName = strcat(ct.dicomInfo.PatientName.FamilyName,'_',ct.dicomInfo.PatientName.GivenName,'_','IntOpData.mat');
+FileName = strcat(ct.dicomInfo.PatientName.FamilyName,'_',ct.dicomInfo.PatientName.GivenName,'_B',num2str(pln.numOfBeams),'IntOpData.mat');
 intOptDataFullname = fullfile(FilePath,FileName);
 
 if (ismember(RefVarNames,AllVarNames))
-
+    fprintf('Begin Saving the base mat file for Intuitive Opt ........ \n');
     save(intOptDataFullname,'ct','cst','pln','stf','dij','-v7.3');
-
+    fprintf('Save base mat file for Intuitive Opt: Done! \n');
 end
 
 
