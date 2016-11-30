@@ -1,22 +1,22 @@
-function varargout = matRadGUI(varargin)
+function varargout = matRad_IntuitiveOptGUI(varargin)
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% matRad GUI
+% matRad IntuitiveOpt GUI
 %
 % call
-%      MATRADGUI, by itself, creates a new MATRADGUI or raises the existing
+%      matRad_IntuitiveOptGUI, by itself, creates a new matRad_IntuitiveOptGUI or raises the existing
 %      singleton*.
 %
-%      H = MATRADGUI returns the handle to a new MATRADGUI or the handle to
+%      H = matRad_IntuitiveOptGUI returns the handle to a new matRad_IntuitiveOptGUI or the handle to
 %      the existing singleton*.
 %
-%      MATRADGUI('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in MATRADGUI.M with the given input arguments.
+%      matRad_IntuitiveOptGUI('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in matRad_IntuitiveOptGUI.M with the given input arguments.
 %
-%      MATRADGUI('Property','Value',...) creates a new MATRADGUI or raises the
+%      matRad_IntuitiveOptGUI('Property','Value',...) creates a new matRad_IntuitiveOptGUI or raises the
 %      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before matRadGUI_OpeningFcn gets called.  An
+%      applied to the GUI before matRad_IntuitiveOptGUI_OpeningFcn gets called.  An
 %      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to matRadGUI_OpeningFcn via varargin.
+%      stop.  All inputs are passed to matRad_IntuitiveOptGUI_OpeningFcn via varargin.
 %
 %      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
 %      instance to run (singleton)".
@@ -57,8 +57,8 @@ javax.swing.UIManager.setLookAndFeel(lf);
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @matRadGUI_OpeningFcn, ...
-                   'gui_OutputFcn',  @matRadGUI_OutputFcn, ...
+                   'gui_OpeningFcn', @matRad_IntuitiveOptGUI_OpeningFcn, ...
+                   'gui_OutputFcn',  @matRad_IntuitiveOptGUI_OutputFcn, ...
                    'gui_LayoutFcn',  [] , ...
                    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
@@ -73,15 +73,15 @@ end
 
 % End initialization code - DO NOT EDIT
 
-% --- Executes just before matRadGUI is made visible.
-function matRadGUI_OpeningFcn(hObject, ~, handles, varargin) 
+% --- Executes just before matRad_IntuitiveOptGUI is made visible.
+function matRad_IntuitiveOptGUI_OpeningFcn(hObject, ~, handles, varargin) 
 %#ok<*DEFNU> 
 %#ok<*AGROW>
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to matRadGUI (see VARARGIN)
+% varargin   command line arguments to matRad_IntuitiveOptGUI (see VARARGIN)
 
 % enable opengl software rendering to visualize linewidths properly
 if ispc
@@ -100,7 +100,7 @@ end
 addpath(fullfile(currFolder,'plotting'));
 addpath(fullfile(currFolder,['plotting' filesep 'colormaps']));
 
-% Choose default command line output for matRadGUI
+% Choose default command line output for matRad_IntuitiveOptGUI
 handles.output = hObject;
 %show matrad logo
 axes(handles.axesLogo)
@@ -316,7 +316,7 @@ guidata(hObject, handles);
 
 function Callback_StructVisibilty(source,~)
 
-handles = guidata(findobj('Name','matRadGUI'));
+handles = guidata(findobj('Name','matRad_IntuitiveOptGUI'));
 
 contextUiChildren = get(get(handles.figure1,'UIContextMenu'),'Children');
 
@@ -326,12 +326,12 @@ if strcmp(get(source,'Checked'),'on')
 else
     set(contextUiChildren(Idx),'Checked','on');
 end
-%guidata(findobj('Name','matRadGUI'), handles);
+%guidata(findobj('Name','matRad_IntuitiveOptGUI'), handles);
 UpdatePlot(handles);
 
 Update
 % --- Outputs from this function are returned to the command line.
-function varargout = matRadGUI_OutputFcn(~, ~, handles) 
+function varargout = matRad_IntuitiveOptGUI_OutputFcn(~, ~, handles) 
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -1067,9 +1067,9 @@ if get(handles.popupTypeOfPlot,'Value') == 2 && exist('Result','var')
     if ~isempty(figHandles)
         v=version;
         if str2double(v(1:3))>= 8.5
-            idxHandle = strcmp({figHandles(:).Name},'matRadGUI');
+            idxHandle = strcmp({figHandles(:).Name},'matRad_IntuitiveOptGUI');
         else
-            idxHandle = strcmp(get(figHandles,'Name'),'matRadGUI');
+            idxHandle = strcmp(get(figHandles,'Name'),'matRad_IntuitiveOptGUI');
         end
     end
     figure(figHandles(idxHandle));
@@ -2545,7 +2545,8 @@ end
 
 %% delete context menu if workspace was deleted manually and refresh button was clicked
 if handles.State == 0
-    objHandle = guidata(findobj('Name','matRadGUI'));  
+   % objHandle = guidata(findobj('Name','matRad_IntuitiveOptGUI'));  
+    objHandle = guidata(findobj('Name','matRad_IntuitiveOptGUI'));  
     contextUi = (get(objHandle.figure1,'UIContextMenu'));
     delete(contextUi)
 end
@@ -3301,6 +3302,15 @@ try
     
     %call the gui
     uiwait(matRad_importGUI);
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     %Check if we have the variables in the workspace
     if evalin('base','exist(''cst'',''var'')') == 1 && evalin('base','exist(''ct'',''var'')') == 1
