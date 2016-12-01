@@ -1283,6 +1283,17 @@ function btnIntuitiveOptimize_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+
+% Add DVCM Folder to path for intuitive optimization
+
+if ~isdeployed
+    currFolder = fileparts(mfilename('fullpath'));
+else
+    currFolder = [];
+end
+
+addpath(fullfile(currFolder,'DVCM'));
+
 try
     % indicate that matRad is busy
     % change mouse pointer to hour glass 
@@ -3860,3 +3871,83 @@ end
 
 
 
+
+
+% --- Executes on selection change in popupmenuTMLevel.
+function popupmenuTMLevel_Callback(hObject, eventdata, handles)
+% hObject    handle to popupmenuTMLevel (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns popupmenuTMLevel contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from popupmenuTMLevel
+
+%update the tabel gui tabel column
+nTMLevel = get(hObject,'Value');
+
+precnames = get(handles.uiTable,'ColumnName');
+precwidth = get(handles.uiTable,'ColumnWidth');
+
+size = numel(precnames);
+
+%Template of name and width
+cnamesT = {'TMU','TMU r','TML','TML r'};
+cwidthT = {50,60,50,60};
+
+%Deta number of unit
+nUnit = nTMLevel -(size -3 )/4;
+
+cnames = precnames;
+cwidth = precwidth;
+
+if ( nUnit ) == 0
+    return;
+elseif nUnit > 0
+   
+    for i = 0:nUnit-1
+        cnames{size + i *4 +1,1} =cnamesT{1,1};
+        cwidth{1,size + i *4 +1} =cwidthT{1,1};
+         
+        cnames{size + i *4 +2,1} =cnamesT{1,2};
+        cwidth{1,size + i *4 +2} =cwidthT{1,2};
+        
+        cnames{size + i *4 +3,1} =cnamesT{1,3};
+        cwidth{1,size + i *4 +3} =cwidthT{1,3};
+        
+        cnames{size + i *4 +4,1} =cnamesT{1,4};
+        cwidth{1,size + i *4 +4} =cwidthT{1,4};   
+    end
+else
+     
+    for i = nUnit:-1
+        cnames = cnames(1:size + i *4 ,1);
+        cwidth = cwidth(1,1:size + i *4);
+         
+    end     
+  
+end
+    
+
+set(handles.uiTable, 'ColumnName',cnames, ...
+                     'ColumnWidth',cwidth);
+
+
+%handles.State=1;
+guidata(hObject,handles);
+UpdateState(handles);
+
+
+
+
+
+% --- Executes during object creation, after setting all properties.
+function popupmenuTMLevel_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to popupmenuTMLevel (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
