@@ -1686,7 +1686,7 @@ for i = 1:size(OldCst,1)
                 if isempty(data{j,1}) || ~isempty(strfind(data{j,1}, 'Select'))
                     FlagValidParameters=false;
                 else
-                    NewCst{Cnt,1}=data{j,1}; 
+                    NewCst{Cnt,1}=data{j,1};  
                 end
                 %VOI Type
                 if isempty(data{j,2})|| ~isempty(strfind(data{j,2}, 'Select'))
