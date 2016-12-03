@@ -3403,7 +3403,7 @@ try
     
       if exist('dij','var')  
           assignin('base','dij',dij); 
-          
+          handles.State = 2; 
       end
      
      

@@ -1,2 +1,8 @@
 ./DVCM/DVCMCasePath
 ./DVCM/DVCMCasePath/*.*
+
+./BOXPHANTOM.mat
+./HEAD_AND_NECK.mat
+./LIVER.mat
+./PROSTATE.mat
+./TG119.mat
