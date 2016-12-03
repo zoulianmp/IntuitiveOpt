@@ -370,7 +370,10 @@ try
 
     % clear state and read new data
     handles.State = 0;
+    fprintf('Begin loading the  mat file  ........ \n');
     load([FilePath FileName]);
+    fprintf('End loading mat file! \n');
+   
     set(handles.legendTable,'String',{'no data loaded'});
     
 catch
@@ -386,7 +389,9 @@ try
     handles.TableChanged = false;
     set(handles.popupTypeOfPlot,'Value',1);
     % precompute contours 
+    fprintf('Beging pre compute VOI Contours! \n');
     cst = matRad_computeVoiContours(ct,cst);
+    fprintf('End pre compute VOI Contours! \n');
     
     assignin('base','ct',ct);
     assignin('base','cst',cst);
@@ -1608,18 +1613,22 @@ for s = 1:size(cst,1)
 end
 set(handles.legendTable,'String',tmpString);
 
-columnname = {'VOI name','VOI type','priority','obj. / const.','penalty','dose', 'EUD','volume','robustness'};
+%columnname = {'VOI name','VOI type','priority','obj. / const.','penalty','dose', 'EUD','volume','robustness'};
 
-AllObjectiveFunction = {'square underdosing','square overdosing','square deviation', 'mean', 'EUD',...
-                        'min dose constraint','max dose constraint',...
-                        'min mean dose constraint','max mean dose constraint',...
-                        'min EUD constraint','max EUD constraint',...
-                        'max DVH constraint','min DVH constraint',...
-                        'max DVH objective' ,'min DVH objective'};
+columnname = {'VOI name','VOI type','priority'};
 
-columnformat = {cst(:,2)',{'OAR','TARGET'},'numeric',...
-       AllObjectiveFunction,...
-       'numeric','numeric','numeric','numeric',{'none','WC','prob'}};
+%AllObjectiveFunction = {'square underdosing','square overdosing','square deviation', 'mean', 'EUD',...
+%                        'min dose constraint','max dose constraint',...
+%                        'min mean dose constraint','max mean dose constraint',...
+%                        'min EUD constraint','max EUD constraint',...
+%                        'max DVH constraint','min DVH constraint',...
+%                        'max DVH objective' ,'min DVH objective'};
+
+columnformat = {cst(:,2)',{'OAR','TARGET'},'numeric'};
+columnformatT = { 'numeric','numeric','numeric','numeric'};
+   
+columneditable = [true true true];
+columneditableT = [true true true true];
    
 numOfObjectives = 0;
 for i = 1:size(cst,1)
@@ -1632,35 +1641,56 @@ dimArr = [numOfObjectives size(columnname,2)];
 data = cell(dimArr);
 data(:,6) = {''};
 Counter = 1;
+
+nLevel = 1;
+tmdlabel={};
+
+ 
 for i = 1:size(cst,1)
    
    if strcmp(cst(i,3),'IGNORED')~=1
        for j=1:size(cst{i,6},1)
-       %VOI
-       data{Counter,1}  = cst{i,2};
-       %VOI Type
-       data{Counter,2}  = cst{i,3};
-       %Priority
-       data{Counter,3}  = cst{i,5}.Priority;
-       %Objective Function
-       objFunc          = cst{i,6}(j).type;
-       data{Counter,4}  = objFunc;
-       % set Penalty
-       data{Counter,5}  = cst{i,6}(j).penalty;
-       data{Counter,6}  = cst{i,6}(j).dose;
-       data{Counter,7}  = cst{i,6}(j).EUD;
-       data{Counter,8}  = cst{i,6}(j).volume;
-       data{Counter,9}  = cst{i,6}(j).robustness;
-       
-       Counter = Counter +1;
+           %VOI
+           data{Counter,1}  = cst{i,2};
+           %VOI Type
+           data{Counter,2}  = cst{i,3};
+           %Priority
+           data{Counter,3}  = cst{i,5}.Priority;
+
+           nLevel = cst{i,6}(j).TMLevel;
+           tmdlabel = cst{i,6}(j).TMDLabel;
+ 
+           tmdarray = cst{i,6}(j).TMDArray;
+
+
+           % Get the TM Values
+           for nIndex= 1:nLevel*4
+               data{Counter,3+nIndex} = tmdarray{nIndex};
+           end
+
+           %Objective Function
+           %objFunc          = cst{i,6}(j).type;
+           %data{Counter,4}  = objFunc;
+           % set Penalty
+           %data{Counter,5}  = cst{i,6}(j).penalty;
+           %data{Counter,6}  = cst{i,6}(j).dose;
+           %data{Counter,7}  = cst{i,6}(j).EUD;
+           %data{Counter,8}  = cst{i,6}(j).volume;
+           %data{Counter,9}  = cst{i,6}(j).robustness;
+
+           Counter = Counter +1;
        end
    end
-   
 end
 
+columnname = addTMDColumnNameAsLevel(columnname,nLevel,tmdlabel);    
+columnformat = addTMDColumnFormatAsLevel(columnformat,nLevel,columnformatT); 
+
+columneditable = addTMDColumnEditableAsLevel(columneditable,nLevel,columneditableT);
+    
 set(handles.uiTable,'ColumnName',columnname);
 set(handles.uiTable,'ColumnFormat',columnformat);
-set(handles.uiTable,'ColumnEditable',[true true true true true true true true true true]);
+set(handles.uiTable,'ColumnEditable',columneditable);
 set(handles.uiTable,'Data',data);
 
 
@@ -1702,23 +1732,45 @@ for i = 1:size(OldCst,1)
                 end
             end
             
+            
+            
+            
             % Obj Func / constraint
-            if isempty(data{j,4}) ||~isempty(strfind(data{j,4}, 'Select'))
-               FlagValidParameters=false;
-            else
-                 NewCst{Cnt,4}(CntObjF,1).type = data{j,4};
-            end
+           % if isempty(data{j,4}) ||~isempty(strfind(data{j,4}, 'Select'))
+           %    FlagValidParameters=false;
+           % else
+           %      NewCst{Cnt,4}(CntObjF,1).type = data{j,4};
+           % end
          
+            nLevel =  get(handles.popupmenuTMLevel,'Value' );
+           
+            columnname = get(handles.uiTable,'ColumnName');
+            
+            tmdarray = data(j,:);
+            
             % get further parameter
+%             if FlagValidParameters
+%                 
+%               NewCst{Cnt,4}(CntObjF,1).dose       = data{j,6};
+%               NewCst{Cnt,4}(CntObjF,1).penalty    = data{j,5};
+%               NewCst{Cnt,4}(CntObjF,1).EUD        = data{j,7};
+%               NewCst{Cnt,4}(CntObjF,1).volume     = data{j,8};
+%               NewCst{Cnt,4}(CntObjF,1).robustness = data{j,9};
+%              
+%             end
+            
             if FlagValidParameters
                 
-              NewCst{Cnt,4}(CntObjF,1).dose       = data{j,6};
-              NewCst{Cnt,4}(CntObjF,1).penalty    = data{j,5};
-              NewCst{Cnt,4}(CntObjF,1).EUD        = data{j,7};
-              NewCst{Cnt,4}(CntObjF,1).volume     = data{j,8};
-              NewCst{Cnt,4}(CntObjF,1).robustness = data{j,9};
+              NewCst{Cnt,4}(CntObjF,1).TMLevel     = nLevel ;
+              NewCst{Cnt,4}(CntObjF,1).TMDLabel    = columnname;
+              NewCst{Cnt,4}(CntObjF,1).TMDArray    = tmdarray;
+           
              
             end
+            
+            
+            
+            
             
             CntObjF = CntObjF+1; 
             
@@ -1775,8 +1827,10 @@ data = get(handles.uiTable, 'data');
 sEnd = size(data,1);
 data{sEnd+1,1} = 'Select VOI';
 data{sEnd+1,2} = 'Select VOI Type';
-data{sEnd+1,4} = 'Select obj func/constraint';
-data{sEnd+1,9} = 'none';
+data{sEnd+1,3} = 1;
+
+%data{sEnd+1,4} = 'Select obj func/constraint';
+%data{sEnd+1,9} = 'none';
 
 set(handles.uiTable,'data',data);
 
@@ -3888,14 +3942,17 @@ nTMLevel = get(hObject,'Value');
 precnames = get(handles.uiTable,'ColumnName');
 precwidth = get(handles.uiTable,'ColumnWidth');
 
-size = numel(precnames);
+npre= numel(precnames);
 
 %Template of name and width
 cnamesT = {'TMU','TMU r','TML','TML r'};
 cwidthT = {50,60,50,60};
 
+dataT = {NaN, NaN, NaN, NaN};
+
+
 %Deta number of unit
-nUnit = nTMLevel -(size -3 )/4;
+nUnit = nTMLevel -(npre -3 )/4;
 
 cnames = precnames;
 cwidth = precwidth;
@@ -3905,31 +3962,57 @@ if ( nUnit ) == 0
 elseif nUnit > 0
    
     for i = 0:nUnit-1
-        cnames{size + i *4 +1,1} =cnamesT{1,1};
-        cwidth{1,size + i *4 +1} =cwidthT{1,1};
+        cnames{npre + i *4 +1,1} =cnamesT{1,1};
+        cwidth{1,npre + i *4 +1} =cwidthT{1,1};
          
-        cnames{size + i *4 +2,1} =cnamesT{1,2};
-        cwidth{1,size + i *4 +2} =cwidthT{1,2};
+        cnames{npre + i *4 +2,1} =cnamesT{1,2};
+        cwidth{1,npre + i *4 +2} =cwidthT{1,2};
         
-        cnames{size + i *4 +3,1} =cnamesT{1,3};
-        cwidth{1,size + i *4 +3} =cwidthT{1,3};
+        cnames{npre + i *4 +3,1} =cnamesT{1,3};
+        cwidth{1,npre + i *4 +3} =cwidthT{1,3};
         
-        cnames{size + i *4 +4,1} =cnamesT{1,4};
-        cwidth{1,size + i *4 +4} =cwidthT{1,4};   
+        cnames{npre + i *4 +4,1} =cnamesT{1,4};
+        cwidth{1,npre + i *4 +4} =cwidthT{1,4};   
+        
+        
     end
 else
      
     for i = nUnit:-1
-        cnames = cnames(1:size + i *4 ,1);
-        cwidth = cwidth(1,1:size + i *4);
+        cnames = cnames(1:npre + i *4 ,1);
+        cwidth = cwidth(1,1:npre + i *4);
          
     end     
   
 end
     
+%update the uitable data content
+
+cdata = get(handles.uiTable,'Data');
+
+[countobjct,ncolumn] = size(cdata);
+
+newData = {};
+
+if nUnit > 0
+    for i = 1:countobjct
+        Newobjectdata =  addTMDColumnDataAsLevel(cdata(i,:),nUnit,dataT);
+        newData(i,:) = Newobjectdata;
+    end 
+
+elseif nUnit <0
+    for i = 1:countobjct
+        Newobjectdata =  cdata(i,1:ncolumn-abs(nUnit)*4);
+        newData(i,:) = Newobjectdata;
+    end 
+    
+end
+
 
 set(handles.uiTable, 'ColumnName',cnames, ...
-                     'ColumnWidth',cwidth);
+                     'ColumnWidth',cwidth, ...
+                     'Data',newData    );       
+              
 
 
 %handles.State=1;
@@ -3951,3 +4034,10 @@ function popupmenuTMLevel_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes during object creation, after setting all properties.
+function uiTable_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to uiTable (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called

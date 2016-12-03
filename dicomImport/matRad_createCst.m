@@ -60,9 +60,9 @@ for i = 1:size(structures,2)
         
        %added for intuitive Optimization
         cst{i,6}(1).TMLevel = 1;
-        cst{i,6}(1).TMDLabel = {'TMU','TMU r','TMl','TML r'}; %used for tabel column name
+        cst{i,6}(1).TMDLabel = {'TMU','TMU r','TML','TML r'}; %used for tabel column name
         %TMD U,TMD U range, TMD L, TMD L range
-        cst{i,6}(1).TMDArray ={ NaN, NaN, NaN, NaN};
+        cst{i,6}(1).TMDArray ={NaN, NaN, NaN, NaN};
         
         
         
