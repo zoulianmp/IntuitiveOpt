@@ -1760,10 +1760,10 @@ for i = 1:size(OldCst,1)
 %             end
             
             if FlagValidParameters
-                
+              %Only save the Truncated Mean Dose related values  
               NewCst{Cnt,4}(CntObjF,1).TMLevel     = nLevel ;
-              NewCst{Cnt,4}(CntObjF,1).TMDLabel    = columnname;
-              NewCst{Cnt,4}(CntObjF,1).TMDArray    = tmdarray;
+              NewCst{Cnt,4}(CntObjF,1).TMDLabel    = columnname(4:numel(columnname));
+              NewCst{Cnt,4}(CntObjF,1).TMDArray    = tmdarray(4:numel(tmdarray));
            
              
             end
