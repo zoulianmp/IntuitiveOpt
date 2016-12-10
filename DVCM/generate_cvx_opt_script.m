@@ -1,12 +1,12 @@
-function generate_cvx_opt_script(cst,filenameroot)
+function generate_cvx_opt_script(intOptParameters)
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % intuitive Optimization cvx model script  creation
 %
 % call
-%   generate_cvx_script(cst,filename)
+%   generate_cvx_script(intOptParameters,filename)
 %
 % input
-%   cst:     structure set with TM Constraints 
+%   intOptParameters:     structure set with TM Constraints 
 %   filenameroot:   the cvx_opt filesname the cvx script name for optimization
 %
 %
@@ -21,6 +21,8 @@ function generate_cvx_opt_script(cst,filenameroot)
 % cvx opt script head
  
 cvx_commonhead = {...
+            ['intOptParameters=evalin(''base'',''intOptParameters'');'],...
+            ['dim = intOptParameters.numOfBixels;'],...
             ['%%% *******************************************'],...
             ['%%% Here begins the cvx model'],...
             ['cvx_begin'],...
@@ -33,12 +35,9 @@ cvx_phase1_object = {['%% PPP measures the infeasibility of satisfying the trunc
                      ['variable PPP']
             };
         
+cvx_phase1_dummyVars = getDummyVarsP1(intOptParameters);
 
-       
-if(isempty(filenameroot))
-    filenameroot= 'cvx_opt_';
-end
-
+filenameroot = intOptParameters.cvxScriptRootName;
 
 currFolder = fileparts(mfilename('fullpath'));
 %***************************************
@@ -52,6 +51,9 @@ fullphase1name = fullfile(currFolder,phase1name);
 fid1 = fopen(fullphase1name,'wt');
 
 print_script_lines(fid1,cvx_commonhead);
+
+print_script_lines(fid1,cvx_phase1_dummyVars);
+
 print_script_lines(fid1,cvx_phase1_object);
 fclose(fid1);
 
@@ -83,7 +85,34 @@ fclose(fid2);
 %*****************************************
 %Begin Inner function block
 
-function targetConstraints = getTargetTMConstraints(targetArray)
+%%% Phase 1
+
+
+function dummyVars = getDummyVarsP1(intOptParameters)
+
+dummyVars{1} =['%%%Dummy variables to help calculate the truncated means'];
+targetvars = 'variables';
+for i = 1 : length(intOptParameters.targetSet)
+   nvoxel =  intOptParameters.targetSet(i).numVoxel;
+   dv = sprintf(' z%d(2,%d)',i,nvoxel);
+   targetvars = strcat(targetvars,dv);
+ 
+end
+dummyVars{2}= targetvars;
+
+oarvars = 'variables';
+for i = 1 : length(intOptParameters.oarSet)
+   nvoxel =  intOptParameters.oarSet(i).numVoxel;
+   dv = sprintf(' z%d(2,%d)',i,nvoxel);
+   oarvars = strcat(oarvars,dv);
+ 
+end
+dummyVars{3}= oarvars;
+
+
+
+
+function targetConstraints = getTargetTMConstraintsP1(targetSet)
 % targetArray: target TM Constraints data from cst{2,6}
 
 
@@ -91,8 +120,43 @@ function targetConstraints = getTargetTMConstraints(targetArray)
 
 
 
-function oarConstraints = getOARTMConstraints(oarArray)
+
+
+
+
+function oarConstraints = getOARTMConstraintsP1(oarSet)
 % oarArray: OAR TM Constraints data from cst{2,6}
+
+
+
+
+
+
+
+
+
+
+
+
+
+%%% Phase 2
+function targetConstraints = getTargetTMConstraintsP2(targetSet)
+% targetArray: target TM Constraints data from cst{2,6}
+
+
+
+
+
+
+
+
+
+
+function oarConstraints = getOARTMConstraintsP2(oarSet)
+% oarArray: OAR TM Constraints data from cst{2,6}
+
+
+
 
 
 

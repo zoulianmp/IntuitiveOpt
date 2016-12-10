@@ -62,7 +62,7 @@ variables WV(dim)
 variable PPP
 
 %% z1 to z7 are dummy variables to help calculate the truncated means
-variables z1(2,num_voxel_oar(Target)) z2(2,num_voxel_oar(Bladder)) z3(2,num_voxel_oar(Rectum))
+variables z1(2,  (Target)) z2(2,num_voxel_oar(Bladder)) z3(2,num_voxel_oar(Rectum))
 variables z4(2,num_voxel_oar(HelpS1)) z5(2,num_voxel_oar(HelpS2)) z6(2,num_voxel_oar(HelpS3))
 variable z7(num_voxel_oar(Body))
 
