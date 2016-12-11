@@ -1,4 +1,4 @@
-function generate_cvx_opt_script(intOptParameters)
+function generate_cvx_opt_fluence_script(intOptParameters)
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % intuitive Optimization cvx model script  creation
 %
@@ -32,12 +32,16 @@ cvx_commonhead = {...
             };
 
 cvx_phase1_object = {['%% PPP measures the infeasibility of satisfying the truncated means constraints'],...
-                     ['variable PPP']
+                     ['variable PPP'],...
+                     ['minimize(PPP)'],
             };
         
 cvx_phase1_dummyVars = getDummyVarsP1(intOptParameters);
 
-filenameroot = intOptParameters.cvxScriptRootName;
+cvx_phase1_targetConstraints = getTargetTMConstraintsP1(intOptParameters.targetSet);
+
+
+filenameroot = strcat(intOptParameters.cvxScriptRootName,'_fluence_');
 
 currFolder = fileparts(mfilename('fullpath'));
 %***************************************
@@ -55,6 +59,12 @@ print_script_lines(fid1,cvx_commonhead);
 print_script_lines(fid1,cvx_phase1_dummyVars);
 
 print_script_lines(fid1,cvx_phase1_object);
+
+print_script_lines(fid1,cvx_phase1_targetConstraints);
+
+
+
+
 fclose(fid1);
 
 
@@ -91,23 +101,35 @@ fclose(fid2);
 function dummyVars = getDummyVarsP1(intOptParameters)
 
 dummyVars{1} =['%%%Dummy variables to help calculate the truncated means'];
+dummyVars{2} =['%%% Target dummy variables:'];
 targetvars = 'variables';
+
+
+
 for i = 1 : length(intOptParameters.targetSet)
    nvoxel =  intOptParameters.targetSet(i).numVoxel;
-   dv = sprintf(' z%d(2,%d)',i,nvoxel);
+   nTMD = numel(intOptParameters.targetSet(i).TMDArray);
+   dummyIndex = intOptParameters.targetSet(i).index;
+   
+   dv = sprintf(' z%d(%d,%d)',dummyIndex,nTMD,nvoxel);
    targetvars = strcat(targetvars,dv);
- 
+   dummyIndex = dummyIndex +1;
 end
-dummyVars{2}= targetvars;
+dummyVars{3}= targetvars;
 
+dummyVars{4}= ['%%% OAR dummy variables:'];
 oarvars = 'variables';
 for i = 1 : length(intOptParameters.oarSet)
    nvoxel =  intOptParameters.oarSet(i).numVoxel;
-   dv = sprintf(' z%d(2,%d)',i,nvoxel);
+   
+   nTMD = numel(intOptParameters.oarSet(i).TMDArray);
+   dummyIndex = intOptParameters.oarSet(i).index;  
+   
+   dv = sprintf(' z%d(%d,%d)',dummyIndex,nTMD,nvoxel);
    oarvars = strcat(oarvars,dv);
- 
+  
 end
-dummyVars{3}= oarvars;
+dummyVars{5}= oarvars;
 
 
 
@@ -115,8 +137,40 @@ dummyVars{3}= oarvars;
 function targetConstraints = getTargetTMConstraintsP1(targetSet)
 % targetArray: target TM Constraints data from cst{2,6}
 
+lineIndex = 1;
 
-
+for i = 1 : length(targetSet)
+    target = targetSet(i);
+    
+    targetNote =  sprintf('%% TM constraints for %s',target.label);
+    targetConstraints{lineIndex} = targetNote;
+    
+    tmdArray = target.TMDArray;
+    
+    for j= 1 : numel(tmdArray)
+       innerIndex = lineIndex + (j-1)*3;
+       
+       tmd = tmdArray{j};
+       
+       if strcmp(tmd.direction,'U')
+           tmdstr1 =  sprintf('intOptParameters.targetSet(%d)*WV-%f<=z%d(%d,:)'';',i,tmd.doseValue,target.index,j);   
+       elseif strcmp(tmd.direction,'L')
+           tmdstr1 =  sprintf('%f-intOptParameters.targetSet(%d)*WV<=z%d(%d,:)'';',tmd.doseValue,i,target.index,j);   
+       end
+       
+       targetConstraints{innerIndex +1} = tmdstr1;
+       
+       
+       tmdstr2 = sprintf('z%d(%d,:)>=0;',target.index,j);
+       targetConstraints{innerIndex +2} = tmdstr2;
+       
+       tmdstr3 = sprintf('sum(z%d(%d,:))/%d<= %f+%f+PPP',target.index,j,target.numVoxel,tmd.TMDValue,tmd.TMDRange);
+       targetConstraints{innerIndex +3} = tmdstr3;
+        
+    end
+    lineIndex = lineIndex + numel(tmdArray)*3;
+    
+end
 
 
 
