@@ -53,17 +53,9 @@ cvx_opt_fluence_phase2;
 
 
 
+%Assigne the WV result to wOpt
+wOpt = WV;
 
-
-
-
-
-
-
-
-
-% Run IPOPT.
-[wOpt, info]           = ipopt(wInit,funcs,options);
 
 % calc dose and reshape from 1D vector to 2D array
 fprintf('Calculating final cubes...\n');

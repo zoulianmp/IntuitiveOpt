@@ -9,7 +9,7 @@ function intOptParameters = getIntuitiveOptParameters(cst,stf,dij)
 tagetIndex = 1;
 oarIndex = 1;
 uidIndex =1; %Give structure a uid for index
-
+totalTM = 0;
 
 for i=1:size(cst,1)
     % for Target
@@ -21,6 +21,9 @@ for i=1:size(cst,1)
         targetSet(tagetIndex).index = uidIndex;
         
         targetSet(tagetIndex).TMDArray = cst{i,6}.TMDArray;
+        
+        totalTM = totalTM + numel(cst{i,6}.TMDArray);
+        
         targetSet(tagetIndex).influenceM = dij.physicalDose{1,1}(cst{i,4}{1},:);
 
         tagetIndex = tagetIndex + 1;
@@ -36,7 +39,10 @@ for i=1:size(cst,1)
         
         oarSet(oarIndex).index = uidIndex;
         
-        oarSet(oarIndex).TMDArray = cst{i,6}.TMDArray;
+        oarSet(oarIndex).TMDArray = cst{i,6}.TMDArray; 
+        totalTM = totalTM + numel(cst{i,6}.TMDArray);
+        
+        
         oarSet(oarIndex).influenceM = dij.physicalDose{1,1}(cst{i,4}{1},:);
 
         oarIndex = oarIndex + 1;
@@ -50,6 +56,12 @@ intOptParameters.targetSet = targetSet;
 intOptParameters.oarSet = oarSet;
 
 intOptParameters.numOfBixels = dij.totalNumOfBixels;
+
+%the bixel intensity value
+intOptParameters.intensityMax = 30;
+
+%the total number of TM Constraints
+intOptParameters.totalTM = totalTM;
 
 
 %assign the variable to base space
