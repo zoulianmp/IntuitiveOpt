@@ -19,6 +19,7 @@ clear
 close all
 clc
 
+fprintf('Beging load Base Data .....\n');
 % load patient data, i.e. ct, voi, cst
 
 %load HEAD_AND_NECK_intopt.mat
@@ -30,6 +31,7 @@ load TG119_intopt_ready.mat
 %load LIVER_intopt.mat
 %load BOXPHANTOM_intopt.mat
 
+fprintf('End load Base Data \n');
 
 resultGUI = matRad_IntuitiveOptfluenceOptimization(dij,cst,pln);
 

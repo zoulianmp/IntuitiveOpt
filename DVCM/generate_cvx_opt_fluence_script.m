@@ -42,6 +42,10 @@ cvx_phase1_dummyVars = getDummyVarsP1(intOptParameters);
 
 cvx_phase1_targetConstraints = getTargetTMConstraintsP1(intOptParameters.targetSet);
 
+
+
+    
+
 cvx_phase1_oarConstraints =  getOARTMConstraintsP1(intOptParameters.oarSet);
 
 wvstr = sprintf('WV<=%d;',intOptParameters.intensityMax );
@@ -56,10 +60,10 @@ cvx_phase1_footer = {...
                      ['%%% *******************************************'],...
                      };
 
-cvx_phase1_save_result = {...
-                     ['% saves the output values to file TTPvalue1'],...
-                     ['save TTPvalue1.mat  WV PPP' ],...
-                     };
+%cvx_phase1_save_result = {...
+%                     ['% saves the output values to file TTPvalue1'],...
+%                     ['save TTPvalue1.mat  WV PPP' ],...
+%                     };
                  
                  
                  
@@ -93,10 +97,10 @@ cvx_phase2_footer = {...
                      };
 
 
-cvx_phase2_save_result = {...
-                     ['% saves the output values to file TTPvalue2'],...
-                     ['save TTPvalue2.mat  WV' ],...
-                     };
+%cvx_phase2_save_result = {...
+%                     ['% saves the output values to file TTPvalue2'],...
+%                     ['save TTPvalue2.mat  WV' ],...
+%                     };
                  
 %End cvx phase2 blocks         
 %********************************
@@ -137,7 +141,7 @@ print_script_lines(fid1,cvx_phase1_oarConstraints);
 
 print_script_lines(fid1,cvx_phase1_footer);
 
-print_script_lines(fid1,cvx_phase1_save_result);
+%print_script_lines(fid1,cvx_phase1_save_result);
 
 fclose(fid1);
 
@@ -170,7 +174,7 @@ print_script_lines(fid2,cvx_phase2_oarConstraints);
 
 print_script_lines(fid2,cvx_phase2_footer);
 
-print_script_lines(fid2,cvx_phase2_save_result);
+%print_script_lines(fid2,cvx_phase2_save_result);
 
 
 fclose(fid2);
@@ -223,6 +227,7 @@ dummyVars{5}= oarvars;
 function targetConstraints = getTargetTMConstraintsP1(targetSet)
 % targetArray: target TM Constraints data from cst{2,6}
 
+targetConstraints = {};
 lineIndex = 1;
 
 for i = 1 : length(targetSet)
@@ -261,6 +266,7 @@ end
 function oarConstraints = getOARTMConstraintsP1(oarSet)
 % oarArray: OAR TM Constraints data from cst{2,6}
 
+oarConstraints = {};
 lineIndex = 1;
 
 for i = 1 : length(oarSet)
@@ -301,6 +307,7 @@ end
 function targetConstraints = getTargetTMConstraintsP2(targetSet)
 % targetArray: target TM Constraints data from cst{2,6}
 
+targetConstraints = {};
 lineIndex = 1;
 
 for i = 1 : length(targetSet)
@@ -340,6 +347,7 @@ end
 function oarConstraints = getOARTMConstraintsP2(oarSet)
 % oarArray: OAR TM Constraints data from cst{2,6}
 
+oarConstraints = {};
 lineIndex = 1;
 
 for i = 1 : length(oarSet)

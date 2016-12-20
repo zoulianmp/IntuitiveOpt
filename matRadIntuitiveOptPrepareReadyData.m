@@ -56,7 +56,7 @@ elseif strcmp(pln.radiationMode,'protons') || strcmp(pln.radiationMode,'carbon')
     dij = matRad_calcParticleDose(ct,stf,pln,cst);
 end
 
-
+ 
 %%%******** ******************
 % save  the intuitive readyDATA
 

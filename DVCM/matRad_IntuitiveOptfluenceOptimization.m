@@ -39,18 +39,23 @@ function [resultIntuitiveOptGUI,infoIntuitiveOpt] = matRad_IntuitiveOptfluenceOp
 fineTuneTMDArrayForIntuitiveOpt;
 
 %get the intOpt Parameters
-intOptParameters = getIntuitiveOptParameters(cst,stf,dij);
+intOptParameters = getIntuitiveOptParameters(cst,dij);
 
 %generate the cvx opt scripts for DVCM
-generate_cvx_opt_fluence_script(intOptParameters);
+ generate_cvx_opt_fluence_script(intOptParameters);
 
 
 %%%********************
 % cvx optimization
 cvx_opt_fluence_phase1;
 
-cvx_opt_fluence_phase2;
+% saves the output values to file TTPvalue1
+save TTPvalue1.mat  WV PPP
 
+
+%cvx_opt_fluence_phase2;
+% saves the output values to file TTPvalue1
+save TTPvalue2.mat  WV
 
 
 %Assigne the WV result to wOpt
@@ -61,11 +66,6 @@ wOpt = WV;
 fprintf('Calculating final cubes...\n');
 resultGUI = matRad_calcCubes(wOpt,dij,cst);
 resultGUI.wUnsequenced = wOpt;
-
-% unset Key Pressed Callback of Matlab command window
-if ~isdeployed
-    set(h_cw, 'KeyPressedCallback',' ');
-end
 
 
 

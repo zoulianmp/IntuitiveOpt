@@ -18,7 +18,8 @@ for i=1:size(cst,1)
         TMDStruct.TMDRange = 0.05;
 		TMDStruct.TMDindex = i;
         
-        cst{i,6}.TMDArray(1) = TMDStruct;
+        cst{i,6}.TMDArray = {};
+        cst{i,6}.TMDArray{1} = TMDStruct;
     
     end
 end
