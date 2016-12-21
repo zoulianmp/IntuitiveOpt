@@ -33,8 +33,17 @@ load TG119_intopt_ready.mat
 
 fprintf('End load Base Data \n');
 
+
+% fine tune the TMDArray for structures in the intuitive Optimization
+fineTuneTMDArrayForIntuitiveOpt;
+
+
+
+fprintf('Beging cvx IntuitiveOpt .....\n');
+
 resultGUI = matRad_IntuitiveOptfluenceOptimization(dij,cst,pln);
 
+fprintf('End cvx IntuitiveOpt \n');
 
 % %% sequencing
 % if strcmp(pln.radiationMode,'photons') && (pln.runSequencing || pln.runDAO)
@@ -48,9 +57,12 @@ resultGUI = matRad_IntuitiveOptfluenceOptimization(dij,cst,pln);
 %    matRad_visApertureInfo(resultGUI.apertureInfo);
 % end
 % 
-% %% start gui for visualization of result
-% matRad_IntuitiveOptGUI
-% 
-% %% dvh
-% matRad_calcDVH(resultGUI,cst,pln)
+
+
+%% start gui for visualization of result
+matRad_IntuitiveOptGUI
+
+%% dvh
+matRad_calcDVH(resultGUI,cst,pln)
+
 

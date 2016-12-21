@@ -1615,7 +1615,7 @@ set(handles.legendTable,'String',tmpString);
 
 %columnname = {'VOI name','VOI type','priority','obj. / const.','penalty','dose', 'EUD','volume','robustness'};
 
-columnname = {'VOI name','VOI type','priority'};
+columnname = {'VOI name','VOI type','priority','TMD levels'};
 
 %AllObjectiveFunction = {'square underdosing','square overdosing','square deviation', 'mean', 'EUD',...
 %                        'min dose constraint','max dose constraint',...
@@ -1624,11 +1624,13 @@ columnname = {'VOI name','VOI type','priority'};
 %                        'max DVH constraint','min DVH constraint',...
 %                        'max DVH objective' ,'min DVH objective'};
 
-columnformat = {cst(:,2)',{'OAR','TARGET'},'numeric'};
-columnformatT = { 'numeric','numeric','numeric','numeric'};
+columnformat = {cst(:,2)',{'OAR','TARGET'},'numeric','numeric'};
+
+%columnformatT = { 'numeric','numeric','numeric','numeric'};
    
-columneditable = [true true true];
-columneditableT = [true true true true];
+columneditable = [true true true false];
+
+%columneditableT = [true true true true];
    
 numOfObjectives = 0;
 for i = 1:size(cst,1)
@@ -1642,8 +1644,8 @@ data = cell(dimArr);
 data(:,6) = {''};
 Counter = 1;
 
-nLevel = 1;
-tmdlabel={};
+%nLevel = 1;
+%tmdlabel={};
 
  
 for i = 1:size(cst,1)
@@ -1657,17 +1659,13 @@ for i = 1:size(cst,1)
            %Priority
            data{Counter,3}  = cst{i,5}.Priority;
 
-           nLevel = cst{i,6}(j).TMLevel;
-           tmdlabel = cst{i,6}(j).TMDLabel;
- 
-           tmdarray = cst{i,6}(j).TMDArray;
+           
+           %Number of TMD Level
+           nLevel = numel(cst{i,6}.TMDArray);
+           
+           data{Counter,4}  = nLevel;
 
-
-           % Get the TM Values
-           for nIndex= 1:nLevel*4
-               data{Counter,3+nIndex} = tmdarray{nIndex};
-           end
-
+           
            %Objective Function
            %objFunc          = cst{i,6}(j).type;
            %data{Counter,4}  = objFunc;
@@ -1683,10 +1681,11 @@ for i = 1:size(cst,1)
    end
 end
 
-columnname = addTMDColumnNameAsLevel(columnname,nLevel,tmdlabel);    
-columnformat = addTMDColumnFormatAsLevel(columnformat,nLevel,columnformatT); 
-
-columneditable = addTMDColumnEditableAsLevel(columneditable,nLevel,columneditableT);
+% 
+% columnname = addTMDColumnNameAsLevel(columnname,nLevel,tmdlabel);    
+% columnformat = addTMDColumnFormatAsLevel(columnformat,nLevel,columnformatT); 
+% 
+% columneditable = addTMDColumnEditableAsLevel(columneditable,nLevel,columneditableT);
     
 set(handles.uiTable,'ColumnName',columnname);
 set(handles.uiTable,'ColumnFormat',columnformat);
@@ -3926,114 +3925,114 @@ end
 
 
 
-
-% --- Executes on selection change in popupmenuTMLevel.
-function popupmenuTMLevel_Callback(hObject, eventdata, handles)
-% hObject    handle to popupmenuTMLevel (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns popupmenuTMLevel contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from popupmenuTMLevel
-
-%update the tabel gui tabel column
-nTMLevel = get(hObject,'Value');
-
-precnames = get(handles.uiTable,'ColumnName');
-precwidth = get(handles.uiTable,'ColumnWidth');
-
-npre= numel(precnames);
-
-%Template of name and width
-cnamesT = {'TMU','TMU r','TML','TML r'};
-cwidthT = {50,60,50,60};
-
-dataT = {NaN, NaN, NaN, NaN};
-
-
-%Deta number of unit
-nUnit = nTMLevel -(npre -3 )/4;
-
-cnames = precnames;
-cwidth = precwidth;
-
-if ( nUnit ) == 0
-    return;
-elseif nUnit > 0
-   
-    for i = 0:nUnit-1
-        cnames{npre + i *4 +1,1} =cnamesT{1,1};
-        cwidth{1,npre + i *4 +1} =cwidthT{1,1};
-         
-        cnames{npre + i *4 +2,1} =cnamesT{1,2};
-        cwidth{1,npre + i *4 +2} =cwidthT{1,2};
-        
-        cnames{npre + i *4 +3,1} =cnamesT{1,3};
-        cwidth{1,npre + i *4 +3} =cwidthT{1,3};
-        
-        cnames{npre + i *4 +4,1} =cnamesT{1,4};
-        cwidth{1,npre + i *4 +4} =cwidthT{1,4};   
-        
-        
-    end
-else
-     
-    for i = nUnit:-1
-        cnames = cnames(1:npre + i *4 ,1);
-        cwidth = cwidth(1,1:npre + i *4);
-         
-    end     
-  
-end
-    
-%update the uitable data content
-
-cdata = get(handles.uiTable,'Data');
-
-[countobjct,ncolumn] = size(cdata);
-
-newData = {};
-
-if nUnit > 0
-    for i = 1:countobjct
-        Newobjectdata =  addTMDColumnDataAsLevel(cdata(i,:),nUnit,dataT);
-        newData(i,:) = Newobjectdata;
-    end 
-
-elseif nUnit <0
-    for i = 1:countobjct
-        Newobjectdata =  cdata(i,1:ncolumn-abs(nUnit)*4);
-        newData(i,:) = Newobjectdata;
-    end 
-    
-end
-
-
-set(handles.uiTable, 'ColumnName',cnames, ...
-                     'ColumnWidth',cwidth, ...
-                     'Data',newData    );       
-              
-
-
-%handles.State=1;
-guidata(hObject,handles);
-UpdateState(handles);
-
-
-
+% 
+% % --- Executes on selection change in popupmenuTMLevel.
+% function popupmenuTMLevel_Callback(hObject, eventdata, handles)
+% % hObject    handle to popupmenuTMLevel (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+% 
+% % Hints: contents = cellstr(get(hObject,'String')) returns popupmenuTMLevel contents as cell array
+% %        contents{get(hObject,'Value')} returns selected item from popupmenuTMLevel
+% 
+% %update the tabel gui tabel column
+% nTMLevel = get(hObject,'Value');
+% 
+% precnames = get(handles.uiTable,'ColumnName');
+% precwidth = get(handles.uiTable,'ColumnWidth');
+% 
+% npre= numel(precnames);
+% 
+% %Template of name and width
+% cnamesT = {'TMU','TMU r','TML','TML r'};
+% cwidthT = {50,60,50,60};
+% 
+% dataT = {NaN, NaN, NaN, NaN};
+% 
+% 
+% %Deta number of unit
+% nUnit = nTMLevel -(npre -3 )/4;
+% 
+% cnames = precnames;
+% cwidth = precwidth;
+% 
+% if ( nUnit ) == 0
+%     return;
+% elseif nUnit > 0
+%    
+%     for i = 0:nUnit-1
+%         cnames{npre + i *4 +1,1} =cnamesT{1,1};
+%         cwidth{1,npre + i *4 +1} =cwidthT{1,1};
+%          
+%         cnames{npre + i *4 +2,1} =cnamesT{1,2};
+%         cwidth{1,npre + i *4 +2} =cwidthT{1,2};
+%         
+%         cnames{npre + i *4 +3,1} =cnamesT{1,3};
+%         cwidth{1,npre + i *4 +3} =cwidthT{1,3};
+%         
+%         cnames{npre + i *4 +4,1} =cnamesT{1,4};
+%         cwidth{1,npre + i *4 +4} =cwidthT{1,4};   
+%         
+%         
+%     end
+% else
+%      
+%     for i = nUnit:-1
+%         cnames = cnames(1:npre + i *4 ,1);
+%         cwidth = cwidth(1,1:npre + i *4);
+%          
+%     end     
+%   
+% end
+%     
+% %update the uitable data content
+% 
+% cdata = get(handles.uiTable,'Data');
+% 
+% [countobjct,ncolumn] = size(cdata);
+% 
+% newData = {};
+% 
+% if nUnit > 0
+%     for i = 1:countobjct
+%         Newobjectdata =  addTMDColumnDataAsLevel(cdata(i,:),nUnit,dataT);
+%         newData(i,:) = Newobjectdata;
+%     end 
+% 
+% elseif nUnit <0
+%     for i = 1:countobjct
+%         Newobjectdata =  cdata(i,1:ncolumn-abs(nUnit)*4);
+%         newData(i,:) = Newobjectdata;
+%     end 
+%     
+% end
+% 
+% 
+% set(handles.uiTable, 'ColumnName',cnames, ...
+%                      'ColumnWidth',cwidth, ...
+%                      'Data',newData    );       
+%               
+% 
+% 
+% %handles.State=1;
+% guidata(hObject,handles);
+% UpdateState(handles);
+% 
 
 
-% --- Executes during object creation, after setting all properties.
-function popupmenuTMLevel_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to popupmenuTMLevel (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
 
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
+% 
+% % --- Executes during object creation, after setting all properties.
+% function popupmenuTMLevel_CreateFcn(hObject, eventdata, handles)
+% % hObject    handle to popupmenuTMLevel (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    empty - handles not created until after all CreateFcns called
+% 
+% % Hint: popupmenu controls usually have a white background on Windows.
+% %       See ISPC and COMPUTER.
+% if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+%     set(hObject,'BackgroundColor','white');
+% end
 
 
 % --- Executes during object creation, after setting all properties.

@@ -3,6 +3,17 @@
 %%%****************************************************
 %%Used for TG119 
 
+
+%% parse variables from base workspace
+AllVarNames = evalin('base','who');
+
+
+if  ismember('cst',AllVarNames)
+    cst = evalin('base','cst');
+end
+
+
+
 %BODY cst{1,6}
 
 % TMDStruct1.doseValue = 1.1;
@@ -50,10 +61,17 @@ TMDStruct2.TMDValue =  0.9611;
 TMDStruct2.TMDRange = 0.013;
 TMDStruct2.TMDindex = 5;
 
+
+
 cst{3,6}.TMDArray = {};
 
 cst{3,6}.TMDArray{1} = TMDStruct1;
 cst{3,6}.TMDArray{2} = TMDStruct2;
         
+
+
+assignin('base','cst',cst);
+
+
 %%End of TG119        
 %%%**************************************************

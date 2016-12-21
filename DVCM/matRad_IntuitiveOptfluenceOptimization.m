@@ -35,14 +35,12 @@ function [resultIntuitiveOptGUI,infoIntuitiveOpt] = matRad_IntuitiveOptfluenceOp
 
 %%% Prepare the data for generate cvx opt scripts
 
-% fine tune the TMDArray for structures in the intuitive Optimization
-fineTuneTMDArrayForIntuitiveOpt;
 
 %get the intOpt Parameters
 intOptParameters = getIntuitiveOptParameters(cst,dij);
 
 %generate the cvx opt scripts for DVCM
- generate_cvx_opt_fluence_script(intOptParameters);
+generate_cvx_opt_fluence_script(intOptParameters);
 
 
 %%%********************
@@ -68,7 +66,7 @@ resultGUI = matRad_calcCubes(wOpt,dij,cst);
 resultGUI.wUnsequenced = wOpt;
 
 
-
+resultIntuitiveOptGUI = resultGUI;
 
 
 
