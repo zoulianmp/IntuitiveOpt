@@ -506,7 +506,7 @@ set(handles.index_popupmenu,'string',indexList);
 %% Setup the TMDTable
 tmdArrayPrescibed =  GetTMDArray(structName);
 
-tmdArrayReal = calculateRealTMDArray(tmdArrayPrescibed);
+tmdArrayReal = calculateRealTMDArray(structName,tmdArrayPrescibed);
 
 
 UpdateTMDTable(handles,structName,tmdArrayPrescibed,tmdArrayReal);
@@ -533,9 +533,11 @@ else
     
 end
 
-if strcmp(tmd.direction, 'U')
+direction = strtrim(tmd.direction);
+
+if strcmp(direction, 'U')
     handles.direction_popupmenu.Value = 2;
-elseif strcmp(tmd.direction, 'L')
+elseif strcmp(direction, 'L')
     handles.direction_popupmenu.Value = 3;
 end
 

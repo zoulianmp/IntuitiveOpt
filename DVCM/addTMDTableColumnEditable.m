@@ -16,7 +16,7 @@ index = 1;
 
 for j = 1:numel(TMDArray)   
      
-    newtCloumneditable{presize + index} =  false;
+    newtCloumneditable(presize + index) =  false;
     index = index + 1;
     
 end

@@ -1,4 +1,4 @@
-function tmd = TMD(direction,DoseValue,StructureDose)
+function tmd = TMDValue(direction,DoseValue,StructureDose)
 %direction: U : Up ,L:Low
 %DoseValue: dose value position for TMD Calculation
 %StructureDose: 1 dimension array of structure Dose.
