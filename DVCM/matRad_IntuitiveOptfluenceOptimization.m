@@ -34,7 +34,7 @@ function [resultIntuitiveOptGUI,infoIntuitiveOpt] = matRad_IntuitiveOptfluenceOp
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%% Prepare the data for generate cvx opt scripts
-
+global intOptParameters;
 
 %get the intOpt Parameters
 intOptParameters = getIntuitiveOptParameters(cst,dij);

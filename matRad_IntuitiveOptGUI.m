@@ -2635,7 +2635,7 @@ getPlnFromGUI(handles);
 
 % text box: # fractions
 function editFraction_Callback(hObject, ~, handles)
-getPlnFromGUI(handles);
+getPlnF romGUI(handles);
 guidata(hObject,handles);
 
 % text box: stratification levels

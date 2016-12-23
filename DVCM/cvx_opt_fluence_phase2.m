@@ -1,4 +1,4 @@
-intOptParameters=evalin('base','intOptParameters');
+global intOptParameters;
 dim = intOptParameters.numOfBixels;
 %%% *******************************************
 %%% Here begins the cvx model

@@ -19,6 +19,10 @@ clear
 close all
 clc
 
+%%%Global variables
+global intOptResultGUI
+
+
 fprintf('Beging load Base Data .....\n');
 % load patient data, i.e. ct, voi, cst
 
@@ -43,6 +47,9 @@ fprintf('Beging cvx IntuitiveOpt .....\n');
 
 resultGUI = matRad_IntuitiveOptfluenceOptimization(dij,cst,pln);
 
+
+intOptResultGUI = resultGUI;
+
 fprintf('End cvx IntuitiveOpt \n');
 
 % %% sequencing
@@ -60,9 +67,13 @@ fprintf('End cvx IntuitiveOpt \n');
 
 
 %% start gui for visualization of result
-matRad_IntuitiveOptGUI
+matRad_IntuitiveOptGUI;
+
+%% TMD 
+matRad_IntuitiveOptTMDDetials;
 
 %% dvh
-matRad_calcDVH(resultGUI,cst,pln)
+matRad_calcDVH(resultGUI,cst,pln);
+
 
 
