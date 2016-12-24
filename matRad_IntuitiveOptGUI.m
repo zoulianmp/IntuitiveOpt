@@ -4040,3 +4040,39 @@ function uiTable_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to uiTable (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
+
+
+% --- Executes on button press in TMDDetail_pushbutton.
+function TMDDetail_pushbutton_Callback(hObject, eventdata, handles)
+% hObject    handle to TMDDetail_pushbutton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+matRad_IntuitiveOptTMDDetials;
+
+updateUITabelData(handles)
+
+
+function updateUITabelData(handles)
+global intOptParameters
+
+data = handles.uiTable.Data;
+
+structlist = data{:,1};
+
+for i=1,numel(structlist)
+    TMDArray = GetTMDArray(structlist(i));
+    data{i,4} = numel(TMDArray);
+end
+
+ handles.uiTable.Data = data;
+
+
+
+
+
+
+
+
+
+

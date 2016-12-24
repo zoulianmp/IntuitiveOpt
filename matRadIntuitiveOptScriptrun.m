@@ -70,7 +70,7 @@ fprintf('End cvx IntuitiveOpt \n');
 matRad_IntuitiveOptGUI;
 
 %% TMD 
-matRad_IntuitiveOptTMDDetials;
+%matRad_IntuitiveOptTMDDetials;
 
 %% dvh
 matRad_calcDVH(resultGUI,cst,pln);

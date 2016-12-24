@@ -48,12 +48,12 @@ generate_cvx_opt_fluence_script(intOptParameters);
 cvx_opt_fluence_phase1;
 
 % saves the output values to file TTPvalue1
-save TTPvalue1.mat  WV PPP
+%save TTPvalue1.mat  WV PPP
 
 
 %cvx_opt_fluence_phase2;
 % saves the output values to file TTPvalue1
-save TTPvalue2.mat  WV
+%save TTPvalue2.mat  WV
 
 
 %Assigne the WV result to wOpt
