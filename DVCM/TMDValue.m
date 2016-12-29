@@ -14,4 +14,6 @@ elseif strcmp(direction,'L')
     validindex = find(StructureDose < DoseValue);
     tmd =  sum(StructureDose(validindex))/length(StructureDose);
        
+else
+    tmd = 0;
 end

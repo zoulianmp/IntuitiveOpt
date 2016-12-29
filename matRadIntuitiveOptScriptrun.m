@@ -20,6 +20,8 @@ close all
 clc
 
 %%%Global variables
+
+global intOptParameters;
 global intOptResultGUI
 
 
@@ -42,6 +44,8 @@ fprintf('End load Base Data \n');
 fineTuneTMDArrayForIntuitiveOpt;
 
 
+%get the intOpt Parameters
+intOptParameters = getIntuitiveOptParameters(cst,dij);
 
 fprintf('Beging cvx IntuitiveOpt .....\n');
 

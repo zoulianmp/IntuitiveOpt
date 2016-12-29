@@ -15,7 +15,7 @@ index = 1;
 for j = 1:numel(TMDArray)   
     TMD = TMDArray{j};      
           
-    item = sprintf('TMD_%.2f_%s',TMD.TMDValue,TMD.direction );
+    item = sprintf('TMD_%.2f_%s',TMD.doseValue,TMD.direction );
   
     newColumnname{presize + index} = item;
     index = index + 1;

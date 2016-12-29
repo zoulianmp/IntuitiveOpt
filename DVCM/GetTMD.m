@@ -13,16 +13,20 @@ for i=1:numel(intOptParameters.targetSet)
 
     if strcmp(structName,label)
       
-       tmdarray =  intOptParameters.targetSet(i).TMDArray;
+        if ~isfield(intOptParameters.targetSet(i), 'TMDArray')        
+            continue;       
+        end 
+        
+        tmdarray =  intOptParameters.targetSet(i).TMDArray;
        
-       for j = 1:numel(tmdarray)
+        for j = 1:numel(tmdarray)
                    
-           if tmdIndex == tmdarray{j}.TMDindex
-               TMD = tmdarray{j};      
-               return 
-           end
+            if tmdIndex == tmdarray{j}.TMDindex
+                TMD = tmdarray{j};      
+                return 
+            end
            
-       end 
+        end 
 
     end    
     
@@ -35,15 +39,19 @@ for i=1:numel(intOptParameters.oarSet)
     label = intOptParameters.oarSet(i).label;
 
     if strcmp(structName,label)
-       tmdarray =  intOptParameters.oarSet(i).TMDArray;
+        
+        if ~isfield(intOptParameters.oarSet(i), 'TMDArray')        
+            continue;       
+        end 
+        
+        tmdarray =  intOptParameters.oarSet(i).TMDArray;
      
-       for j = 1:numel(tmdarray)
-         if tmdIndex == tmdarray{j}.TMDindex
-               TMD = tmdarray{j};      
-               return 
-         end
-           
-           
+        for j = 1:numel(tmdarray)
+          
+            if tmdIndex == tmdarray{j}.TMDindex       
+                TMD = tmdarray{j};      
+                return   
+            end  
        end 
     end   
     

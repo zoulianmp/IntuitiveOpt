@@ -9,7 +9,14 @@ tmdindex = 1;
 
 
 for i=1:numel(intOptParameters.targetSet)
-    tmdArray = intOptParameters.targetSet(i).TMDArray;
+    
+    if isfield(intOptParameters.targetSet(i), 'TMDArray')        
+        tmdArray =  intOptParameters.targetSet(i).TMDArray;
+    else
+        tmdArray = [];
+
+    end 
+
 
     
     for j=1:numel(tmdArray)       
@@ -25,7 +32,13 @@ end
 %find the oar
 
 for i=1:numel(intOptParameters.oarSet)
-    tmdArray = intOptParameters.oarSet(i).TMDArray;
+    
+    if isfield(intOptParameters.oarSet(i), 'TMDArray')        
+        tmdArray =  intOptParameters.oarSet(i).TMDArray;
+    else
+        tmdArray = [];
+
+    end 
 
     
     for j=1:numel(tmdArray)
@@ -37,4 +50,5 @@ for i=1:numel(intOptParameters.oarSet)
     
 end
 
+intOptParameters.totalTM = tmdindex -1;
 

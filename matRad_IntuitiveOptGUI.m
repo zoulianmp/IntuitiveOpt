@@ -202,6 +202,14 @@ try
         ct  = evalin('base','ct');
         cst = evalin('base','cst');
         setCstTable(handles,cst);
+        
+        %if has intOptParameters
+        gvs =who('global');
+        
+        if ismember('intOptParameters',gvs)  
+            updateUITabelData(handles);
+        end
+
         handles.State = 1;
         % check if contours are precomputed
         if size(cst,2) < 7
@@ -1659,10 +1667,13 @@ for i = 1:size(cst,1)
            %Priority
            data{Counter,3}  = cst{i,5}.Priority;
 
+           nLevel = 0;
            
-           %Number of TMD Level
-           nLevel = numel(cst{i,6}.TMDArray);
-           
+           if isfield(cst{i,6}, 'TMDArray')          
+               %Number of TMD Level
+               nLevel = numel(cst{i,6}.TMDArray);
+           end
+                 
            data{Counter,4}  = nLevel;
 
            
@@ -4049,8 +4060,7 @@ function TMDDetail_pushbutton_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 matRad_IntuitiveOptTMDDetials;
-
-updateUITabelData(handles)
+%updateUITabelData(handles);
 
 
 function updateUITabelData(handles)
@@ -4058,10 +4068,14 @@ global intOptParameters
 
 data = handles.uiTable.Data;
 
-structlist = data{:,1};
+structlist = data(:,1);
 
-for i=1,numel(structlist)
+for i =1:numel(structlist)
     TMDArray = GetTMDArray(structlist(i));
+    if(isempty (TMDArray))
+        continue;
+    end
+    
     data{i,4} = numel(TMDArray);
 end
 
@@ -4070,9 +4084,39 @@ end
 
 
 
+% --- Executes on button press in updateTabel_pushbutton.
+function updateTabel_pushbutton_Callback(hObject, eventdata, handles)
+% hObject    handle to updateTabel_pushbutton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+updateUITabelData(handles);
+
+
+% --- Executes on button press in resumeOpt_pushbutton.
+function resumeOpt_pushbutton_Callback(hObject, eventdata, handles)
+% hObject    handle to resumeOpt_pushbutton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+global intOptResultGUI
+
+fprintf('Resume  cvx IntuitiveOpt .....\n');
+
+
+dij = evalin('base','dij');
+cst = evalin('base','cst');
+pln = evalin('base','pln');
+
+resultGUI = matRad_IntuitiveOptfluenceOptimization(dij,cst,pln);
+intOptResultGUI = resultGUI;
+
+fprintf('End cvx IntuitiveOpt \n');
 
 
 
+%update the matRad GUI Show
+UpdatePlot(handles);
 
 
 

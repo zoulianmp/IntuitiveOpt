@@ -195,33 +195,73 @@ function dummyVars = getDummyVarsP1(intOptParameters)
 
 dummyVars{1} =['%%%Dummy variables to help calculate the truncated means'];
 dummyVars{2} =['%%% Target dummy variables:'];
-targetvars = 'variables';
 
-
+nvars_t = 0;
+dummyvars = '';
 
 for i = 1 : length(intOptParameters.targetSet)
    nvoxel =  intOptParameters.targetSet(i).numVoxel;
+       
+   if ~isfield(intOptParameters.targetSet(i), 'TMDArray')
+        continue;                              
+   end
+     
    nTMD = numel(intOptParameters.targetSet(i).TMDArray);
    dummyIndex = intOptParameters.targetSet(i).index;
    
    dv = sprintf(' z%d(%d,%d)',dummyIndex,nTMD,nvoxel);
-   targetvars = strcat(targetvars,dv);
-   dummyIndex = dummyIndex +1;
+   dummyvars = strcat(dummyvars,dv);
+    
+   nvars_t = nvars_t +1;
 end
-dummyVars{3}= targetvars;
 
+if nvars_t ==  1
+    targetvars = 'variable';
+elseif  nvars_t ==  0
+    targetvars = '';   
+elseif nvars_t >1
+    targetvars = 'variables';
+end
+
+targetvars = strcat(targetvars,dummyvars);
+
+dummyVars{3}= targetvars;
+%******************************************************
 dummyVars{4}= ['%%% OAR dummy variables:'];
 oarvars = 'variables';
+
+nvars_o = 0;
+dummyvars = '';
+
 for i = 1 : length(intOptParameters.oarSet)
-   nvoxel =  intOptParameters.oarSet(i).numVoxel;
+   nvoxel =  intOptParameters.oarSet(i).numVoxel; 
+      
+   if ~isfield(intOptParameters.oarSet(i), 'TMDArray')
+        continue;                                  
+   end
    
    nTMD = numel(intOptParameters.oarSet(i).TMDArray);
    dummyIndex = intOptParameters.oarSet(i).index;  
    
    dv = sprintf(' z%d(%d,%d)',dummyIndex,nTMD,nvoxel);
-   oarvars = strcat(oarvars,dv);
+   dummyvars = strcat(dummyvars,dv);
+   
+   nvars_o = nvars_o + 1;
   
 end
+
+
+if nvars_o ==  1
+    oarvars = 'variable';
+elseif  nvars_o ==  0
+    oarvars = '';   
+elseif nvars_o >1
+    oarvars = 'variables';
+end
+
+
+oarvars = strcat(oarvars,dummyvars);
+
 dummyVars{5}= oarvars;
 
 function targetConstraints = getTargetTMConstraintsP1(targetSet)
@@ -236,6 +276,9 @@ for i = 1 : length(targetSet)
     targetNote =  sprintf('%% TM constraints for %s',target.label);
     targetConstraints{lineIndex} = targetNote;
     
+    if ~isfield(target, 'TMDArray')
+        continue;                              
+    end
     tmdArray = target.TMDArray;
     
     for j= 1 : numel(tmdArray)
@@ -274,6 +317,9 @@ for i = 1 : length(oarSet)
     
     oarNote =  sprintf('%% TM constraints for %s',oar.label);
     oarConstraints{lineIndex} = oarNote;
+    if ~isfield(oar, 'TMDArray')
+        continue;                              
+    end
     
     tmdArray = oar.TMDArray;
     
@@ -316,6 +362,9 @@ for i = 1 : length(targetSet)
     targetNote =  sprintf('%% TM constraints for %s',target.label);
     targetConstraints{lineIndex} = targetNote;
     
+    if ~isfield(target, 'TMDArray')
+        continue;                              
+    end
     tmdArray = target.TMDArray;
     
     for j= 1 : numel(tmdArray)
@@ -355,6 +404,11 @@ for i = 1 : length(oarSet)
     
     oarNote =  sprintf('%% TM constraints for %s',oar.label);
     oarConstraints{lineIndex} = oarNote;
+    
+        
+    if ~isfield(oar, 'TMDArray')
+        continue;                              
+    end
     
     tmdArray = oar.TMDArray;
     

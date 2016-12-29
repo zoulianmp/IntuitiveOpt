@@ -22,7 +22,7 @@ function varargout = matRad_IntuitiveOptTMDDetials(varargin)
 
 % Edit the above text to modify the response to help matRad_IntuitiveOptTMDDetials
 
-% Last Modified by GUIDE v2.5 22-Dec-2016 19:40:44
+% Last Modified by GUIDE v2.5 24-Dec-2016 16:18:46
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -154,7 +154,22 @@ indexList = {'New',indexList{:}};
 set(handles.index_popupmenu,'string',indexList);
 handles.index_popupmenu.Value = 1;
 
+%%update the TMD Details table
+
+tmdArrayPrescibed =  GetTMDArray(structName);
+tmdArrayReal = calculateRealTMDArray(structName,tmdArrayPrescibed);
+
+UpdateTMDTable(handles,structName,tmdArrayPrescibed,tmdArrayReal);
+
+
+
+
 guidata(hObject, handles);
+
+
+
+
+
 
 
 
@@ -260,16 +275,10 @@ function add_TMDpushbutton_Callback(hObject, eventdata, handles)
 
 
 SetTMD(structName,tmdindex,tmd);
-    
-if tmdindex == -1 
-    
-    ReindexPrescribedTMDS;
-    
-    initialGUITMDPart(handles);
-
-    
-end
-
+      
+ReindexPrescribedTMDS;
+  
+initialGUITMDPart(handles);
 
 
 
@@ -433,6 +442,24 @@ function calculate_c_pushbutton_Callback(hObject, eventdata, handles)
 % hObject    handle to calculate_c_pushbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+tmdArray={};
+
+strutName =  strtrim(handles.structure_c_popupmenu.String(handles.structure_c_popupmenu.Value));
+
+
+TMDStruct1.doseValue = str2num(handles.doseposition_c_edit.String);
+TMDStruct1.direction = strtrim(handles.direction_c_popupmenu.String(handles.direction_c_popupmenu.Value));
+TMDStruct1.TMDValue = 0;
+TMDStruct1.TMDRange = 0;
+TMDStruct1.TMDindex = -1;
+
+tmdArray{1} = TMDStruct1;
+
+tmdArrayCal = calculateRealTMDArray(strutName,tmdArray);
+
+handles.tmdvalue_c_edit.String = num2str(tmdArrayCal{1}.TMDValue);
+
+
 
 
 
@@ -463,10 +490,32 @@ function resumeOpt_pushbutton_Callback(hObject, eventdata, handles)
 % hObject    handle to resumeOpt_pushbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+global intOptResultGUI
+
+fprintf('Resume  cvx IntuitiveOpt .....\n');
+status = sprintf('Start resume cvx IntuitiveOpt');
+
+handles.optstatues_edit.String = status;
+
+dij = evalin('base','dij');
+cst = evalin('base','cst');
+pln = evalin('base','pln');
+
+resultGUI = matRad_IntuitiveOptfluenceOptimization(dij,cst,pln);
+intOptResultGUI = resultGUI;
+
+fprintf('End cvx IntuitiveOpt \n');
+
+status = sprintf('End resume cvx IntuitiveOpt');
+handles.optstatues_edit.String = status;
 
 
+%Update the TMD Detail show
+initialGUITMDPart(handles);
 
 
+%update the matRad GUI Show
+matRad_IntuitiveOptGUI;
 
 
 
@@ -598,7 +647,7 @@ tmd.doseValue = str2num( handles.doseposition_edit.String);
 tmd.TMDValue =  str2num( handles.tmdvalue_edit.String);
 tmd.TMDRange =  str2num( handles.tmdrange_edit.String);
 
-tmd.direction=  handles.direction_popupmenu.String{handles.direction_popupmenu.Value};
+tmd.direction= strtrim( handles.direction_popupmenu.String{handles.direction_popupmenu.Value});
 
 
 
@@ -609,3 +658,26 @@ tmd.direction=  handles.direction_popupmenu.String{handles.direction_popupmenu.V
 
 %% End function blocks by zoulian 
 %*******************************************
+
+
+
+function optstatues_edit_Callback(hObject, eventdata, handles)
+% hObject    handle to optstatues_edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of optstatues_edit as text
+%        str2double(get(hObject,'String')) returns contents of optstatues_edit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function optstatues_edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to optstatues_edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end

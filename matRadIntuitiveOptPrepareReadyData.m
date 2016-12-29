@@ -21,11 +21,11 @@ clc
 
 % load patient data, i.e. ct, voi, cst
 
-%load HEAD_AND_NECK_intopt.mat
-load TG119_intopt.mat
-%load PROSTATE_intopt.mat
-%load LIVER_intopt.mat
-%load BOXPHANTOM_intopt.mat
+%load HEAD_AND_NECK.mat
+load TG119.mat
+%load PROSTATE.mat
+%load LIVER.mat
+%load BOXPHANTOM.mat
 
 % meta information for treatment plan
 pln.isoCenter       = matRad_getIsoCenter(cst,ct,0);

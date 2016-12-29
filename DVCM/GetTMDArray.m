@@ -12,9 +12,14 @@ for i=1:numel(intOptParameters.targetSet)
 
     if strcmp(structName,label)
       
-       TMDArray =  intOptParameters.targetSet(i).TMDArray;
-       
-       return;
+         if isfield(intOptParameters.targetSet(i), 'TMDArray')
+               
+             TMDArray =  intOptParameters.targetSet(i).TMDArray;
+         else
+              TMDArray = [];
+
+         end
+         return;
 
     end    
     
@@ -27,8 +32,14 @@ for i=1:numel(intOptParameters.oarSet)
     label = intOptParameters.oarSet(i).label;
 
     if strcmp(structName,label)
-        TMDArray  =  intOptParameters.oarSet(i).TMDArray;
-        return;
+        
+         if isfield(intOptParameters.oarSet(i), 'TMDArray')        
+             TMDArray =  intOptParameters.oarSet(i).TMDArray;
+         else
+             TMDArray = [];
+
+         end 
+         return;
      
     end   
     

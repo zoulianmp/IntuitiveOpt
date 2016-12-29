@@ -22,9 +22,13 @@ oarSet = [];
         targetSet(tagetIndex).label = cst{i,2};
         targetSet(tagetIndex).index = uidIndex;
         
-        targetSet(tagetIndex).TMDArray = cst{i,6}.TMDArray;
+        if isfield(cst{i,6}, 'TMDArray')
+            
+            targetSet(tagetIndex).TMDArray = cst{i,6}.TMDArray;
+            totalTM = totalTM + numel(cst{i,6}.TMDArray);
+                
+        end
         
-        totalTM = totalTM + numel(cst{i,6}.TMDArray);
         
         targetSet(tagetIndex).influenceM = dij.physicalDose{1,1}(cst{i,4}{1},:);
 
@@ -41,9 +45,10 @@ oarSet = [];
         
         oarSet(oarIndex).index = uidIndex;
         
-        oarSet(oarIndex).TMDArray = cst{i,6}.TMDArray; 
-        totalTM = totalTM + numel(cst{i,6}.TMDArray);
-        
+        if isfield(cst{i,6}, 'TMDArray')  
+            oarSet(oarIndex).TMDArray = cst{i,6}.TMDArray; 
+            totalTM = totalTM + numel(cst{i,6}.TMDArray);            
+        end
         
         oarSet(oarIndex).influenceM = dij.physicalDose{1,1}(cst{i,4}{1},:);
 
