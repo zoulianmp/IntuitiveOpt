@@ -35,11 +35,10 @@ cvx_commonhead = {...
 %Begin cvx phase1 blocks        
 cvx_phase1_object = {['%% PPP measures the infeasibility of satisfying the truncated means constraints'],...
                      ['variable PPP'],...
-                     ['minimize(PPP)'],...
-                     ['subject to'],...
+                     ['minimize(PPP)'],
             };
         
-cvx_phase1_dummyExpression = getDummyExpressionP1(intOptParameters);
+cvx_phase1_dummyVars = getDummyVarsP1(intOptParameters);
 
 cvx_phase1_targetConstraints = getTargetTMConstraintsP1(intOptParameters.targetSet);
 
@@ -49,13 +48,13 @@ cvx_phase1_targetConstraints = getTargetTMConstraintsP1(intOptParameters.targetS
 
 cvx_phase1_oarConstraints =  getOARTMConstraintsP1(intOptParameters.oarSet);
 
-wvstr = sprintf('  WV<=%d;',intOptParameters.intensityMax );
+wvstr = sprintf('WV<=%d;',intOptParameters.intensityMax );
 
 
 cvx_phase1_footer = {...
                      [wvstr],...
-                     ['  WV>=0;'],...
-                     ['  PPP>=0;'],...
+                     ['WV>=0;'],...
+                     ['PPP>=0;'],...
                      ['cvx_end '],...            
                      ['%%% Here End the cvx model'],...
                      ['%%% *******************************************'],...
@@ -76,12 +75,10 @@ p2_str1 = sprintf('variable PPP2(%d);',intOptParameters.totalTM );
 
 cvx_phase2_object = {['%% PPP2 measures how much we can shrink the right hand side of the truncated mean constrants'],...
                      [p2_str1],...
-                     ['maximize(sum(PPP2))'],... 
-                     ['subject to'],...
-                     
+                     ['maximize(sum(PPP2))'],
             };
 
-cvx_phase2_dummyExpression = getDummyExpressionP1(intOptParameters);
+cvx_phase2_dummyVars = getDummyVarsP1(intOptParameters);
 
 
 cvx_phase2_targetConstraints = getTargetTMConstraintsP2(intOptParameters.targetSet);
@@ -133,7 +130,7 @@ fid1 = fopen(fullphase1name,'wt');
 
 print_script_lines(fid1,cvx_commonhead);
 
-print_script_lines(fid1,cvx_phase1_dummyExpression);
+print_script_lines(fid1,cvx_phase1_dummyVars);
 
 print_script_lines(fid1,cvx_phase1_object);
 
@@ -166,7 +163,7 @@ fullphase2name = fullfile(currFolder,phase2name);
 fid2 = fopen(fullphase2name,'wt');
 print_script_lines(fid2,cvx_commonhead);
 
-print_script_lines(fid2,cvx_phase2_dummyExpression);
+print_script_lines(fid2,cvx_phase2_dummyVars);
 
 print_script_lines(fid2,cvx_phase2_object);
 
@@ -194,10 +191,10 @@ fclose(fid2);
 %%% Phase 1
 
 
-function dummyExpression = getDummyExpressionP1(intOptParameters)
+function dummyVars = getDummyVarsP1(intOptParameters)
 
-dummyExpression{1} =['%%%Dummy expression hodlers to help calculate the truncated means'];
-dummyExpression{2} =['%%% Target dummy expression:'];
+dummyVars{1} =['%%%Dummy variables to help calculate the truncated means'];
+dummyVars{2} =['%%% Target dummy variables:'];
 
 nvars_t = 0;
 dummyvars = '';
@@ -219,18 +216,19 @@ for i = 1 : length(intOptParameters.targetSet)
 end
 
 if nvars_t ==  1
-    targetvars = 'expression';
+    targetvars = 'variable';
 elseif  nvars_t ==  0
     targetvars = '';   
 elseif nvars_t >1
-    targetvars = 'expressions';
+    targetvars = 'variables';
 end
 
 targetvars = strcat(targetvars,dummyvars);
 
-dummyExpression{3}= targetvars;
+dummyVars{3}= targetvars;
 %******************************************************
-dummyExpression{4}= ['%%% OAR dummy expressions:'];
+dummyVars{4}= ['%%% OAR dummy variables:'];
+oarvars = 'variables';
 
 nvars_o = 0;
 dummyvars = '';
@@ -254,17 +252,17 @@ end
 
 
 if nvars_o ==  1
-    oarvars = 'expression';
+    oarvars = 'variable';
 elseif  nvars_o ==  0
     oarvars = '';   
 elseif nvars_o >1
-    oarvars = 'expressions';
+    oarvars = 'variables';
 end
 
 
 oarvars = strcat(oarvars,dummyvars);
 
-dummyExpression{5}= oarvars;
+dummyVars{5}= oarvars;
 
 function targetConstraints = getTargetTMConstraintsP1(targetSet)
 % targetArray: target TM Constraints data from cst{2,6}
@@ -275,7 +273,7 @@ lineIndex = 1;
 for i = 1 : length(targetSet)
     target = targetSet(i);
     
-    targetNote =  sprintf('  %% TM constraints for %s',target.label);
+    targetNote =  sprintf('%% TM constraints for %s',target.label);
     targetConstraints{lineIndex} = targetNote;
     
     if ~isfield(target, 'TMDArray')
@@ -289,15 +287,19 @@ for i = 1 : length(targetSet)
        tmd = tmdArray{j};
        
        if strcmp(tmd.direction,'U')
-           tmdstr1 =  sprintf('  z%d(%d,:) =  pos(intOptParameters.targetSet(%d).influenceM*WV-%f) ;',target.index,j,i,tmd.doseValue);   
+           tmdstr1 =  sprintf('intOptParameters.targetSet(%d).influenceM*WV-%f<=z%d(%d,:)'';',i,tmd.doseValue,target.index,j);   
        elseif strcmp(tmd.direction,'L')
-           tmdstr1 =  sprintf('  z%d(%d,:) =  pos( %f-intOptParameters.targetSet(%d).influenceM*WV) ;',target.index,j,tmd.doseValue,i);   
+           tmdstr1 =  sprintf('%f-intOptParameters.targetSet(%d).influenceM*WV<=z%d(%d,:)'';',tmd.doseValue,i,target.index,j);   
        end
        
        targetConstraints{innerIndex +1} = tmdstr1;
-            
-       tmdstr2 = sprintf('  sum(z%d(%d,:))/%d<= %f+%f+PPP',target.index,j,target.numVoxel,tmd.TMDValue,tmd.TMDRange);
+       
+       
+       tmdstr2 = sprintf('z%d(%d,:)>=0;',target.index,j);
        targetConstraints{innerIndex +2} = tmdstr2;
+       
+       tmdstr3 = sprintf('sum(z%d(%d,:))/%d<= %f+%f+PPP',target.index,j,target.numVoxel,tmd.TMDValue,tmd.TMDRange);
+       targetConstraints{innerIndex +3} = tmdstr3;
         
     end
     lineIndex = lineIndex + numel(tmdArray)*3;
@@ -313,7 +315,7 @@ lineIndex = 1;
 for i = 1 : length(oarSet)
     oar = oarSet(i);
     
-    oarNote =  sprintf('  %% TM constraints for %s',oar.label);
+    oarNote =  sprintf('%% TM constraints for %s',oar.label);
     oarConstraints{lineIndex} = oarNote;
     if ~isfield(oar, 'TMDArray')
         continue;                              
@@ -326,20 +328,20 @@ for i = 1 : length(oarSet)
        
        tmd = tmdArray{j};
        
-       
-        
        if strcmp(tmd.direction,'U')
-           tmdstr1 =  sprintf('  z%d(%d,:) =  pos(intOptParameters.targetSet(%d).influenceM*WV-%f) ;',oar.index,j,i,tmd.doseValue);   
+           tmdstr1 =  sprintf('intOptParameters.oarSet(%d).influenceM*WV-%f<=z%d(%d,:)'';',i,tmd.doseValue,oar.index,j);   
        elseif strcmp(tmd.direction,'L')
-           tmdstr1 =  sprintf('  z%d(%d,:) =  pos( %f-intOptParameters.targetSet(%d).influenceM*WV) ;',oar.index,j,tmd.doseValue,i);   
+           tmdstr1 =  sprintf('%f-intOptParameters.oarSet(%d).influenceM*WV<=z%d(%d,:)'';',tmd.doseValue,i,oar.index,j);   
        end
        
-
        oarConstraints{innerIndex +1} = tmdstr1;
-
        
-       tmdstr2 = sprintf('  sum(z%d(%d,:))/%d<= %f+%f+PPP',oar.index,j,oar.numVoxel,tmd.TMDValue,tmd.TMDRange);
+       
+       tmdstr2 = sprintf('z%d(%d,:)>=0;',oar.index,j);
        oarConstraints{innerIndex +2} = tmdstr2;
+       
+       tmdstr3 = sprintf('sum(z%d(%d,:))/%d<= %f+%f+PPP',oar.index,j,oar.numVoxel,tmd.TMDValue,tmd.TMDRange);
+       oarConstraints{innerIndex +3} = tmdstr3;
         
     end
     lineIndex = lineIndex + numel(tmdArray)*3+1;
@@ -370,17 +372,20 @@ for i = 1 : length(targetSet)
        
        tmd = tmdArray{j};
        
-       
        if strcmp(tmd.direction,'U')
-           tmdstr1 =  sprintf('  z%d(%d,:) =  pos(intOptParameters.targetSet(%d).influenceM*WV-%f) ;',target.index,j,i,tmd.doseValue);   
+           tmdstr1 =  sprintf('intOptParameters.targetSet(%d).influenceM*WV-%f<=z%d(%d,:)'';',i,tmd.doseValue,target.index,j);   
        elseif strcmp(tmd.direction,'L')
-           tmdstr1 =  sprintf('  z%d(%d,:) =  pos( %f-intOptParameters.targetSet(%d).influenceM*WV) ;',target.index,j,tmd.doseValue,i);   
+           tmdstr1 =  sprintf('%f-intOptParameters.targetSet(%d).influenceM*WV<=z%d(%d,:)'';',tmd.doseValue,i,target.index,j);   
        end
-
+       
        targetConstraints{innerIndex +1} = tmdstr1;
        
-       tmdstr2 = sprintf('  sum(z%d(%d,:))/%d<= %f+%f+PPP-PPP2(%d)',target.index,j,target.numVoxel,tmd.TMDValue,tmd.TMDRange,tmd.TMDindex);
+       
+       tmdstr2 = sprintf('z%d(%d,:)>=0;',target.index,j);
        targetConstraints{innerIndex +2} = tmdstr2;
+       
+       tmdstr3 = sprintf('sum(z%d(%d,:))/%d<= %f+%f+PPP-PPP2(%d)',target.index,j,target.numVoxel,tmd.TMDValue,tmd.TMDRange,tmd.TMDindex);
+       targetConstraints{innerIndex +3} = tmdstr3;
         
     end
     lineIndex = lineIndex + numel(tmdArray)*3;
@@ -412,17 +417,20 @@ for i = 1 : length(oarSet)
        
        tmd = tmdArray{j};
        
-       
        if strcmp(tmd.direction,'U')
-           tmdstr1 =  sprintf('  z%d(%d,:) =  pos(intOptParameters.targetSet(%d).influenceM*WV-%f) ;',oar.index,j,i,tmd.doseValue);   
+           tmdstr1 =  sprintf('intOptParameters.oarSet(%d).influenceM*WV-%f<=z%d(%d,:)'';',i,tmd.doseValue,oar.index,j);   
        elseif strcmp(tmd.direction,'L')
-           tmdstr1 =  sprintf('  z%d(%d,:) =  pos( %f-intOptParameters.targetSet(%d).influenceM*WV) ;',oar.index,j,tmd.doseValue,i);   
+           tmdstr1 =  sprintf('%f-intOptParameters.oarSet(%d).influenceM*WV<=z%d(%d,:)'';',tmd.doseValue,i,oar.index,j);   
        end
-             
+       
        oarConstraints{innerIndex +1} = tmdstr1;
-             
-       tmdstr = sprintf('  sum(z%d(%d,:))/%d<= %f+%f+PPP-PPP2(%d)',oar.index,j,oar.numVoxel,tmd.TMDValue,tmd.TMDRange,tmd.TMDindex);
+       
+       
+       tmdstr2 = sprintf('z%d(%d,:)>=0;',oar.index,j);
        oarConstraints{innerIndex +2} = tmdstr2;
+       
+       tmdstr3 = sprintf('sum(z%d(%d,:))/%d<= %f+%f+PPP-PPP2(%d)',oar.index,j,oar.numVoxel,tmd.TMDValue,tmd.TMDRange,tmd.TMDindex);
+       oarConstraints{innerIndex +3} = tmdstr3;
         
     end
     lineIndex = lineIndex + numel(tmdArray)*3+1;
