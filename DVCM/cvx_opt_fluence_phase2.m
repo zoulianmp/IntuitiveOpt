@@ -17,10 +17,10 @@ maximize(sum(PPP2))
 subject to
 % TM constraints for OuterTarget
   z3(1,:) =  pos( 1.930000-intOptParameters.targetSet(1).influenceM*WV) ;
-  sum(z3(1,:))/7429<= 0.156400+0.058000+PPP-PPP2(1)
+  sum(z3(1,:))/7429<= 0.106400+0.005800+PPP-PPP2(4)
 
   z3(2,:) =  pos(intOptParameters.targetSet(1).influenceM*WV-2.000000) ;
-  sum(z3(2,:))/7429<= 1.200000+0.130000+PPP-PPP2(2)
+  sum(z3(2,:))/7429<= 0.961100+0.013000+PPP-PPP2(5)
 % TM constraints for Core
   WV<=7.928591e-01;
 WV>=0;

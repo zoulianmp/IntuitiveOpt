@@ -17,12 +17,17 @@ minimize(PPP)
 subject to
   % TM constraints for OuterTarget
   z3(1,:) =  pos( 1.930000-intOptParameters.targetSet(1).influenceM*WV) ;
-  sum(z3(1,:))/7429<= 0.156400+0.058000+PPP
+  sum(z3(1,:))/7429<= 0.106400+0.005800+PPP
 
   z3(2,:) =  pos(intOptParameters.targetSet(1).influenceM*WV-2.000000) ;
-  sum(z3(2,:))/7429<= 1.200000+0.130000+PPP
+  sum(z3(2,:))/7429<= 0.961100+0.013000+PPP
   % TM constraints for Core
   WV<=7.928591e-01;
+  
+  i = ceil(2.66);
+  
+  j = floor(3.56);
+  
   WV>=0;
   PPP>=0;
 cvx_end 
