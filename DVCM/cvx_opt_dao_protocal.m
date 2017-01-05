@@ -51,7 +51,7 @@ cvx_precision high
 variable ApertureWeight(realTotalApertures)
 
 %%每个beam的覆盖范围是不一样的，所以变量后面数字表示Beam的编号
-variables LLeafPosition1(numLeaves1) RLeafPosition1(numLeaves1)
+variables LLeafPosition1(numLeaves1) RLeafPosition1(numLeaves1) 
 
 expression WV(dim) %%% WV is the vector of beamlet intensities
 %%%Dummy expression hodlers to help calculate the truncated means

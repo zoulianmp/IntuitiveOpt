@@ -15,7 +15,7 @@
 %
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-clear
+clear all
 close all
 clc
 
@@ -39,18 +39,34 @@ pln.radiationMode   = 'photons'; % either photons / protons / carbon
 pln.bioOptimization = 'none'; % none: physical optimization; effect: effect-based optimization; RBExD: optimization of RBE-weighted dose
 pln.numOfFractions  = 30;
 pln.runSequencing   = false; % 1/true: run sequencing, 0/false: don't / will be ignored for particles and also triggered by runDAO below
-pln.runDAO          = false; % 1/true: run DAO, 0/false: don't / will be ignored for particles
+pln.runDAO          = true; % 1/true: run DAO, 0/false: don't / will be ignored for particles
 pln.machine         = 'Generic';
 
+% Add new MLC Structure
+if pln.runDAO  
+    addMLCPhysicalParameters;
+end
 %% initial visualization and change objective function settings if desired
 %matRad_IntuitiveOptGUI
 
+
 %% generate steering file
-stf = matRad_generateStf(ct,cst,pln);
+if pln.runDAO  
+   % mlc = evalin('base','MLC');
+    stf_dao = matRad_generateStfDAO(ct,cst,pln,MLC);
+else
+    stf = matRad_generateStf(ct,cst,pln);
+end
+
 
 %% dose calculation
 if strcmp(pln.radiationMode,'photons')
-    dij = matRad_calcPhotonDose(ct,stf,pln,cst);
+    if pln.runDAO  
+        dij = matRad_calcPhotonDoseDAO(ct,stf_dao,pln,cst);
+    else
+        dij = matRad_calcPhotonDose(ct,stf,pln,cst);
+    end
+
     %dij = matRad_calcPhotonDoseVmc(ct,stf,pln,cst);
 elseif strcmp(pln.radiationMode,'protons') || strcmp(pln.radiationMode,'carbon')c
     dij = matRad_calcParticleDose(ct,stf,pln,cst);
