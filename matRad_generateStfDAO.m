@@ -170,11 +170,16 @@ for i = 1:length(pln.gantryAngles)
     stf(i).numOfRays = size(rayPos,1);
     
     % Save ray and target position in beam eye´s view (bev)
+    % Save the bixel size 
     for j = 1:stf(i).numOfRays
         stf(i).ray(j).rayPos_bev = rayPos(j,:);
+        stf(i).ray(j).rayBixelXWidth = xWidth(j);
+        stf(i).ray(j).rayBixelYWidth = yWidth(j);
+        
         stf(i).ray(j).targetPoint_bev = [2*stf(i).ray(j).rayPos_bev(1) ...
                                                                SAD ...
                                          2*stf(i).ray(j).rayPos_bev(3)];
+                                     
     end
     
     % source position in bev

@@ -35,6 +35,11 @@ MLC.coverRegion = [400,400];
 %X offset for cover larger region, because of pairGapMax limit
 MLC.carriageOffsetX = 0.0;
 
+%Type 1 : X = 5 mm, Y= 5 m
+MLC.daoBixelTypes(1,:) =[5,5];
+
+%Type 1 : X = 5 mm, Y= 10 m
+MLC.daoBixelTypes(2,:) =[5,10];
 
 
 

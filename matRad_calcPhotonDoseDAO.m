@@ -1,4 +1,4 @@
-function dij = matRad_calcPhotonDose(ct,stf,pln,cst,calcDoseDirect)
+function dij = matRad_calcPhotonDoseDAO(ct,stf,pln,cst,mlc,calcDoseDirect)
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % matRad photon dose calculation wrapper
 % 
@@ -10,6 +10,7 @@ function dij = matRad_calcPhotonDose(ct,stf,pln,cst,calcDoseDirect)
 %   stf:            matRad steering information struct
 %   pln:            matRad plan meta information struct
 %   cst:            matRad cst struct
+%   mlc:            mlc struct relates to collimator constraints
 %   calcDoseDirect: boolian switch to bypass dose influence matrix
 %                   computation and directly calculate dose; only makes
 %                   sense in combination with matRad_calcDoseDirect.m
@@ -119,17 +120,29 @@ convResolution = .5; % [mm]
 sigmaGauss = 2.123/convResolution; % [mm] / see diploma thesis siggel 4.1.2
 gaussFilter =  1/(2*pi*sigmaGauss^2) * exp(-(X.^2+Z.^2)/(2*sigmaGauss^2*convResolution^2) );
 
-if ~(strcmp(num2str(pln.bixelWidth),'field'))
-    % Create zero matrix for the Fluence
-    F = zeros(size(X));
+% Array for saving bixelType fluence
+bixelTypeFluences = {};
 
-    % set bixel opening to one
-    F(X >= -pln.bixelWidth/2 & X < pln.bixelWidth/2 & ...
-      Z >= -pln.bixelWidth/2 & Z < pln.bixelWidth/2) = 1;
-    % gaussian convolution of field to model penumbra
-    if ~useCustomPrimFluenceBool
-        F = real(fftshift(ifft2(fft2( ifftshift(F) ).*fft2( ifftshift(gaussFilter) ))));
-    end
+if ~(strcmp(num2str(pln.bixelWidth),'field'))
+    
+    for i = 1: size(mlc.daoBixelTypes,1)
+
+        xwidth = mlc.daoBixelTypes(i,1);
+        ywidth = mlc.daoBixelTypes(i,2);
+  
+        % Create zero matrix for the Fluence
+        FType = zeros(size(X));
+        % set bixel opening to one
+        FType(X >= -xwidth/2 & X < xwidth/2 & ...
+          Z >= -ywidth/2 & Z < ywidth/2) = 1;
+        % gaussian convolution of field to model penumbra
+        if ~useCustomPrimFluenceBool
+            FType = real(fftshift(ifft2(fft2( ifftshift(FType) ).*fft2( ifftshift(gaussFilter) ))));
+        end
+    
+        bixelTypeFluences{i} = FType;
+        
+    end      
 end
 
 counter = 0;
@@ -202,26 +215,72 @@ for i = 1:dij.numOfBeams; % loop over all beams
         fprintf(['matRad: Uniform primary photon fluence -> pre-compute kernel convolution for SSD = ' ... 
                 num2str(machine.data.kernel(currSSD).SSD) ' mm ...\n']);    
 
-        % 2D convolution of Fluence and Kernels in fourier domain
-        convMx1 = real(fftshift(ifft2(fft2( ifftshift(F) ).*fft2( ifftshift(kernel1Mx) ) )));
-        convMx2 = real(fftshift(ifft2(fft2( ifftshift(F) ).*fft2( ifftshift(kernel2Mx) ) )));
-        convMx3 = real(fftshift(ifft2(fft2( ifftshift(F) ).*fft2( ifftshift(kernel3Mx) ) )));
+        % Array for saving bixelType convolution Matrix for given ssd
+        bixelTypeconvMx1 = {};          
+        bixelTypeconvMx2 = {};   
+        bixelTypeconvMx3 = {};    
+        
+        %Array for saving bixelType interpolation function for convolution
+        %matrix.
+        bixelTypeInterp_kernel1 = {};
+        bixelTypeInterp_kernel2 = {};
+        bixelTypeInterp_kernel3 = {};
+              
+        for i = 1: size(mlc.daoBixelTypes,1)
 
-        % Creates an interpolant for kernes from vectors position X and Z
-        if exist('griddedInterpolant','class') % use griddedInterpoland class when available 
-            Interp_kernel1 = griddedInterpolant(X',Z',convMx1','linear');
-            Interp_kernel2 = griddedInterpolant(X',Z',convMx2','linear');
-            Interp_kernel3 = griddedInterpolant(X',Z',convMx3','linear');
-        else
-            Interp_kernel1 = @(x,y)interp2(X(1,:),Z(:,1),convMx1,x,y,'linear');
-            Interp_kernel2 = @(x,y)interp2(X(1,:),Z(:,1),convMx2,x,y,'linear');
-            Interp_kernel3 = @(x,y)interp2(X(1,:),Z(:,1),convMx3,x,y,'linear');
+            FType =  bixelTypeFluences{i};
+            
+            % 2D convolution of Fluence and Kernels in fourier domain
+            convMx1 = real(fftshift(ifft2(fft2( ifftshift(FType) ).*fft2( ifftshift(kernel1Mx) ) )));
+            convMx2 = real(fftshift(ifft2(fft2( ifftshift(FType) ).*fft2( ifftshift(kernel2Mx) ) )));
+            convMx3 = real(fftshift(ifft2(fft2( ifftshift(FType) ).*fft2( ifftshift(kernel3Mx) ) )));
+
+            bixelTypeconvMx1{i} = convMx1;
+            bixelTypeconvMx2{i} = convMx2;
+            bixelTypeconvMx3{i} = convMx3;
+            
+            
+            % Creates an interpolant for kernes from vectors position X and Z
+            if exist('griddedInterpolant','class') % use griddedInterpoland class when available 
+                Interp_kernel1 = griddedInterpolant(X',Z',convMx1','linear');
+                Interp_kernel2 = griddedInterpolant(X',Z',convMx2','linear');
+                Interp_kernel3 = griddedInterpolant(X',Z',convMx3','linear');
+            else
+                Interp_kernel1 = @(x,y)interp2(X(1,:),Z(:,1),convMx1,x,y,'linear');
+                Interp_kernel2 = @(x,y)interp2(X(1,:),Z(:,1),convMx2,x,y,'linear');
+                Interp_kernel3 = @(x,y)interp2(X(1,:),Z(:,1),convMx3,x,y,'linear');
+            end
+            
+            bixelTypeInterp_kernel1{i} = Interp_kernel1;
+            bixelTypeInterp_kernel2{i} = Interp_kernel2;
+            bixelTypeInterp_kernel3{i} = Interp_kernel3;               
         end
+        
     end
 
     
     for j = 1:stf(i).numOfRays % loop over all rays / for photons we only have one bixel per ray!
 
+        % get proper precalculated data to support bixel influence matrix
+        % calculation
+        bixelsize = [stf(i).ray(j).rayBixelXWidth,stf(i).ray(j).rayBixelXWidth];
+        for itype = 1:size(mlc.daoBixelTypes,1)
+            if ~sum(bixelsize -mlc.daoBixelTypes(itype,:))
+                F =  bixelTypeFluences{itype}; 
+                
+                convMx1 =  bixelTypeconvMx1{i};
+                convMx2 =  bixelTypeconvMx2{i};
+                convMx3 =  bixelTypeconvMx3{i};
+                
+                Interp_kernel1 = bixelTypeInterp_kernel1{i};
+                Interp_kernel2 = bixelTypeInterp_kernel2{i};
+                Interp_kernel3 = bixelTypeInterp_kernel3{i};         
+                
+            end         
+            break;
+        end
+           
+        
         counter = counter + 1;
         bixelsPerBeam = bixelsPerBeam + 1;
     

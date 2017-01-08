@@ -45,6 +45,9 @@ pln.machine         = 'Generic';
 % Add new MLC Structure
 if pln.runDAO  
     addMLCPhysicalParameters;
+    pln.aperturesPerBeam = [15,15,15,15,15];
+    pln.totalApertures = sum( pln.aperturesPerBeam);
+    
 end
 %% initial visualization and change objective function settings if desired
 %matRad_IntuitiveOptGUI
@@ -62,7 +65,7 @@ end
 %% dose calculation
 if strcmp(pln.radiationMode,'photons')
     if pln.runDAO  
-        dij = matRad_calcPhotonDoseDAO(ct,stf_dao,pln,cst);
+        dij_dao = matRad_calcPhotonDoseDAO(ct,stf_dao,pln,cst,MLC);
     else
         dij = matRad_calcPhotonDose(ct,stf,pln,cst);
     end
@@ -76,10 +79,27 @@ end
 %%%******** ******************
 % save  the intuitive readyDATA
 
-%save HEAD_AND_NECK_intopt_ready.mat cst ct dij pln stf
-save TG119_intopt_ready.mat cst ct dij pln stf
-%save PROSTATE_intopt_ready.mat cst ct dij pln stf
-%save LIVER_intopt_ready.mat cst ct dij pln stf
-%save BOXPHANTOM_intopt_ready.mat cst ct dij pln stf
+ if pln.runDAO  
+     
+        
+     %save HEAD_AND_NECK_intopt_ready_dao.mat cst ct dij_dao pln stf_dao MLC
+
+     save TG119_intopt_ready_dao.mat cst ct dij_dao pln stf_dao MLC
+
+        
+     %save PROSTATE_intopt_ready_dao.mat cst ct dij_dao pln stf_dao MLC
+     %save LIVER_intopt_ready_dao.mat cst ct dij_dao pln stf_dao MLC
+     %save BOXPHANTOM_intopt_ready_dao.mat cst ct dij_dao pln stf_dao MLC
+
+ else
+
+    %save HEAD_AND_NECK_intopt_ready.mat cst ct dij pln stf
+    save TG119_intopt_ready.mat cst ct dij pln stf
+    %save PROSTATE_intopt_ready.mat cst ct dij pln stf
+    %save LIVER_intopt_ready.mat cst ct dij pln stf
+    %save BOXPHANTOM_intopt_ready.mat cst ct dij pln stf
+
+ end
 
 
+ fprintf('intopt ready mat saved');

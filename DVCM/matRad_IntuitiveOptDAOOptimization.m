@@ -1,14 +1,13 @@
-function [resultIntuitiveOptGUI,infoIntuitiveOpt] = matRad_IntuitiveOptFluenceOptimization(dij,cst,pln)
+function [resultIntuitiveOptGUI,infoIntuitiveOpt] = matRad_IntuitiveOptDAOOptimization(dij,cst)
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % matRad Intuitive Optimization inverse planning wrapper function
 % 
 % call
-%    [resultIntuitiveOptGUI,infoIntuitiveOpt] = matRad_IntuitiveOptfluenceOptimization(dij,cst,pln)
+%    [resultIntuitiveOptGUI,infoIntuitiveOpt] = matRad_IntuitiveOptDAOOptimization(dij,cst)
 %
 % input
 %   dij:        matRad dij struct
 %   cst:        matRad cst struct
-%   pln:        matRad pln struct
 %
 % output
 %   resultIntuitiveOptGUI:  struct containing optimized fluence vector, dose, and (for
@@ -40,18 +39,18 @@ global intOptParameters;
 %intOptParameters = getIntuitiveOptParameters(cst,dij);
 
 %generate the cvx opt scripts for DVCM
-generate_cvx_opt_fluence_script(intOptParameters);
+generate_cvx_opt_dao_script(intOptParameters);
 
 
 %%%********************
 % cvx optimization
-cvx_opt_fluence_phase1;
+cvx_opt_dao_phase1;
 
 % saves the output values to file TTPvalue1
 %save TTPvalue1.mat  WV PPP
 
 
-%cvx_opt_fluence_phase2;
+%cvx_opt_dao_phase2;
 % saves the output values to file TTPvalue1
 %save TTPvalue2.mat  WV
 

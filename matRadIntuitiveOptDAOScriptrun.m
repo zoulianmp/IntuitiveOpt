@@ -30,7 +30,7 @@ fprintf('Beging load Base Data .....\n');
 
 %load HEAD_AND_NECK_intopt.mat
 
-load TG119_intopt_ready.mat
+load TG119_intopt_ready_dao.mat
 
 
 %load PROSTATE_intopt.mat
@@ -45,11 +45,11 @@ fineTuneTMDArrayForIntuitiveOpt;
 
 
 %get the intOpt Parameters
-intOptParameters = getIntuitiveOptParameters(cst,dij);
+intOptParameters = getIntuitiveOptDAOParameters(cst,dij_dao,stf_dao,pln);
 
 fprintf('Beging cvx IntuitiveOpt .....\n');
 
-resultGUI = matRad_IntuitiveOptFluenceOptimization(dij,cst,pln);
+resultGUI = matRad_IntuitiveOptDAOOptimization(dij_dao,cst);
 
 
 intOptResultGUI = resultGUI;
