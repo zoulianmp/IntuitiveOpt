@@ -1,6 +1,12 @@
 ./DVCM/DVCMCasePath
 ./DVCM/DVCMCasePath/*.*
 
+./DVCM/cvx_opt_fluence_phase1.m
+./DVCM/cvx_opt_fluence_phase2.m
+
+./DVCM/cvx_opt_dao_phase1.m
+./DVCM/cvx_opt_dao_phase2.m
+
 ./BOXPHANTOM.mat
 ./HEAD_AND_NECK.mat
 ./LIVER.mat

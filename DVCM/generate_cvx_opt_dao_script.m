@@ -139,7 +139,7 @@ print_script_lines(fid1,cvx_phase1_Expression);
 
 print_script_lines(fid1,cvx_phase1_object);
 
-print_script_lines(fid1,cvx_phase1_getWVBlock);
+print_WV_calculation_script_blocks(fid1,intOptParameters)
 
 print_script_lines(fid1,cvx_phase1_targetConstraints);
 
@@ -330,8 +330,8 @@ oarvars = strcat(oarvars,dummyvars);
 
 Expression{7}= oarvars;
 
-Expression{8} = ['%%%Intermedia expression for easier setting contraints '];
-Expression{9} = ['expression ApertureWeights LLeafPositions RLeafPositions'] ;
+%Expression{8} = ['%%%Intermedia expression for easier setting contraints '];
+%Expression{9} = ['expression ApertureWeights LLeafPositions RLeafPositions'] ;
 
 
 function targetConstraints = getTargetTMConstraintsP1(targetSet)
@@ -421,22 +421,55 @@ rLeafPosStr =  sprintf('RLeafPositions%d',nBeam);
 aperturewStr =  sprintf('ApertureWeights%d',nBeam);
 beamWVStr =  sprintf('BeamWV%d',nBeam);
 
+fitShapeStr = sprintf('fitShape%d',nBeam);
+
+
 fitShape = intOptParameters.fitShapes{nBeam};
 aperturesNum = intOptParameters.aperturesPerBeam(nBeam);
 
+beamwvCodeBlock{1} = sprintf('  %%************************Begin of Beam %d  WV Calculation',nBeam);    
 
-beamwvCodeBlock{1} = sprintf('fitShape%d = intOptParameters.fitShapes{%d};',nBeam,nBeam);
+beamwvCodeBlock{2} = sprintf('  fitShape%d = intOptParameters.fitShapes{%d};',nBeam,nBeam);
+%beamwvCodeBlock{2} = sprintf('cumsum(test)fitShape%d.indexEndX - fitShape%d.indexStartX'
 
-beamwvCodeBlock{2} = sprintf('for apertureindex = 1:%d',aperturesNum);
-beamwvCodeBlock{3} = sprintf('    for leafindex = 1:%d',fitShape.nLeaves);
 
-beamwvCodeBlock{4} = sprintf('         nleafBixels = fitShape%d.indexEndX(leafindex) - fitShape%d.indexEndX(leafindex)',nBeam,nBeam);
-beamwvCodeBlock{5} = sprintf('         leafWV = zeros(1,nleafBixels);');
 
-beamwvCodeBlock{5} = sprintf('         x1 = %s(leafindex,apertureindex);',lLeafPosStr);
-beamwvCodeBlock{6} = sprintf('         x2 = %s(leafindex,apertureindex);',rLeafPosStr);
-                
-                
+beamwvCodeBlock{3} = sprintf('  %s = zeros(1,%d);',beamWVStr,fitShape.totalBixels);    
+
+
+
+beamwvCodeBlock{4} = sprintf('  for apertureindex = 1:%d',aperturesNum);
+beamwvCodeBlock{5} = sprintf('      for leafindex = 1:%d',fitShape.nLeaves);
+
+beamwvCodeBlock{6} = sprintf('           nleafBixels = fitShape%d.indexEndX(leafindex) - fitShape%d.indexEndX(leafindex)',nBeam,nBeam);
+beamwvCodeBlock{7} = sprintf('           leafWV = zeros(1,nleafBixels);');
+
+beamwvCodeBlock{8} = sprintf('           x1 = %s(leafindex,apertureindex);',lLeafPosStr);
+beamwvCodeBlock{9} = sprintf('           x2 = %s(leafindex,apertureindex);',rLeafPosStr);
+beamwvCodeBlock{10} = sprintf('           boundary_x1 = fitShape%d.boundaryX1(leafindex);',nBeam);                
+beamwvCodeBlock{11} = sprintf('           boundary_x2 = fitShape%d.boundaryX2(leafindex);',nBeam);                     
+beamwvCodeBlock{12} = sprintf('           i = ceil( (x1 - boundary_x1)/%d );',fitShape.bixelWidth);
+beamwvCodeBlock{13} = sprintf('           weightI =%s(apertureindex)* ((i* %d) - (x1 - boundary_x1))/%d;',aperturewStr,fitShape.bixelWidth,fitShape.bixelWidth);
+beamwvCodeBlock{14} = sprintf('           leafWV (i) = leafWV (i) + weightI;');
+
+beamwvCodeBlock{15} = sprintf('           j = floor( (x2 - boundary_x1)/%d );',fitShape.bixelWidth);
+beamwvCodeBlock{16} = sprintf('           weightJp1 = %s(apertureindex)*( (x2 - boundary_x1) - (j* %d))/%d;',aperturewStr,fitShape.bixelWidth,fitShape.bixelWidth);
+
+beamwvCodeBlock{17} = sprintf('           if j +1 <= nleafBixels');
+beamwvCodeBlock{18} = sprintf('                leafWV (j+1) = leafWV (j+1) + weightJp1;');
+
+beamwvCodeBlock{19} = sprintf('           end');
+
+beamwvCodeBlock{20} = sprintf('           if leafindex == 1 ');
+beamwvCodeBlock{21} = sprintf('                %s(1:%s.cumsumIndex(leafindex)) = %s(1:%s.cumsumIndex(leafindex)) + leafWV;',beamWVStr,fitShapeStr,beamWVStr,fitShapeStr);
+beamwvCodeBlock{22} = sprintf('           else');
+beamwvCodeBlock{23} = sprintf('                BeamWV1(%s.cumsumIndex(leafindex-1)+1:%s.cumsumIndex(leafindex))= BeamWV1(%s.cumsumIndex(leafindex-1)+1:%s.cumsumIndex(leafindex)) + leafWV; ',...
+                                             fitShapeStr,fitShapeStr,fitShapeStr,fitShapeStr);
+beamwvCodeBlock{24} = sprintf('           end');
+                    
+beamwvCodeBlock{25} = sprintf('       end');
+beamwvCodeBlock{26} = sprintf('  end');     
+beamwvCodeBlock{27} = sprintf('  %%************************End of Beam %d  WV Calculation',nBeam);    
 
 %%% Phase 2
 function targetConstraints = getTargetTMConstraintsP2(targetSet)
@@ -531,8 +564,19 @@ for i = 1 : length(stringcell)
 end
 
     
+function print_WV_calculation_script_blocks(fid,intOptParameters)
 
+WVstr = '';
 
+for i = 1:numel(intOptParameters.aperturesPerBeam)
+   sblock =  generate_getBeamWVScriptBlock(i,intOptParameters);
+   print_script_lines(fid,sblock);
+   
+   beamWVstr =  sprintf(' BeamWV%d',i);
+   WVstr = strcat(WVstr,beamWVstr);
+end
+
+fprintf(fid,'  WV = [%s];\n',WVstr);
 
 %end Inner function block
 %*****************************************

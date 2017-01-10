@@ -4108,7 +4108,7 @@ dij = evalin('base','dij');
 cst = evalin('base','cst');
 pln = evalin('base','pln');
 
-resultGUI = matRad_IntuitiveOptfluenceOptimization(dij,cst,pln);
+resultGUI = matRad_IntuitiveOptFluenceOptimization(dij,cst,pln);
 intOptResultGUI = resultGUI;
 
 fprintf('End cvx IntuitiveOpt \n');

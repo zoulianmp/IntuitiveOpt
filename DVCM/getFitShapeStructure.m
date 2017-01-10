@@ -62,7 +62,9 @@ for leafn = fitShape.indexStartY:fitShape.indexEndY
 end
 
  fitShape.totalBixels =  sum(fitShape.indexEndX - fitShape.indexStartX + 1);
-
+ 
+ %the bixel index for easy access 1D Vector elements.
+ fitShape.cumsumIndex = cumsum(fitShape.indexEndX - fitShape.indexStartX + 1);
 
 
 end  %getFitShapeStructure
