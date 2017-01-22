@@ -12,7 +12,14 @@ for i=1:numel(intOptParameters.targetSet)
 
     if strcmp(structName,label)
       
-       tmdarray =  intOptParameters.targetSet(i).TMDArray;
+
+       preexist = isfield(intOptParameters.targetSet(i),'TMDArray');
+       if (preexist)
+           tmdarray =  intOptParameters.targetSet(i).TMDArray;
+       else
+           intOptParameters.targetSet(i).TMDArray = {};
+           tmdarray = {};
+       end
        
        for j = 1:numel(tmdarray)
                    
@@ -38,8 +45,15 @@ for i=1:numel(intOptParameters.oarSet)
     label = intOptParameters.oarSet(i).label;
 
     if strcmp(structName,label)
-       tmdarray =  intOptParameters.oarSet(i).TMDArray;
-     
+         
+        preexist = isfield(intOptParameters.oarSet(i),'TMDArray');
+        if (preexist)
+           tmdarray =  intOptParameters.oarSet(i).TMDArray;      
+        else
+           intOptParameters.oarSet(i).TMDArray = {};
+           tmdarray = {};
+       end
+        
        for j = 1:numel(tmdarray)
          if tmdIndex == tmdarray{j}.TMDindex
               intOptParameters.oarSet(i).TMDArray{j} = TMD;  
