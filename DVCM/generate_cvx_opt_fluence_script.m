@@ -329,9 +329,9 @@ for i = 1 : length(oarSet)
        
         
        if strcmp(tmd.direction,'U')
-           tmdstr1 =  sprintf('  z%d(%d,:) =  pos(intOptParameters.targetSet(%d).influenceM*WV-%f) ;',oar.index,j,i,tmd.doseValue);   
+           tmdstr1 =  sprintf('  z%d(%d,:) =  pos(intOptParameters.oarSet(%d).influenceM*WV-%f) ;',oar.index,j,i,tmd.doseValue);   
        elseif strcmp(tmd.direction,'L')
-           tmdstr1 =  sprintf('  z%d(%d,:) =  pos( %f-intOptParameters.targetSet(%d).influenceM*WV) ;',oar.index,j,tmd.doseValue,i);   
+           tmdstr1 =  sprintf('  z%d(%d,:) =  pos( %f-intOptParameters.oarSet(%d).influenceM*WV) ;',oar.index,j,tmd.doseValue,i);   
        end
        
 
@@ -414,14 +414,14 @@ for i = 1 : length(oarSet)
        
        
        if strcmp(tmd.direction,'U')
-           tmdstr1 =  sprintf('  z%d(%d,:) =  pos(intOptParameters.targetSet(%d).influenceM*WV-%f) ;',oar.index,j,i,tmd.doseValue);   
+           tmdstr1 =  sprintf('  z%d(%d,:) =  pos(intOptParameters.oarSet(%d).influenceM*WV-%f) ;',oar.index,j,i,tmd.doseValue);   
        elseif strcmp(tmd.direction,'L')
-           tmdstr1 =  sprintf('  z%d(%d,:) =  pos( %f-intOptParameters.targetSet(%d).influenceM*WV) ;',oar.index,j,tmd.doseValue,i);   
+           tmdstr1 =  sprintf('  z%d(%d,:) =  pos( %f-intOptParameters.oarSet(%d).influenceM*WV) ;',oar.index,j,tmd.doseValue,i);   
        end
              
        oarConstraints{innerIndex +1} = tmdstr1;
              
-       tmdstr = sprintf('  sum(z%d(%d,:))/%d<= %f+%f+PPP-PPP2(%d)',oar.index,j,oar.numVoxel,tmd.TMDValue,tmd.TMDRange,tmd.TMDindex);
+       tmdstr2 = sprintf('  sum(z%d(%d,:))/%d<= %f+%f+PPP-PPP2(%d)',oar.index,j,oar.numVoxel,tmd.TMDValue,tmd.TMDRange,tmd.TMDindex);
        oarConstraints{innerIndex +2} = tmdstr2;
         
     end
