@@ -1623,7 +1623,7 @@ set(handles.legendTable,'String',tmpString);
 
 %columnname = {'VOI name','VOI type','priority','obj. / const.','penalty','dose', 'EUD','volume','robustness'};
 
-columnname = {'VOI name','VOI type','priority','TMD levels'};
+columnname = {'VOI name','VOI type','Dose(Gy)','priority','TMD levels'};
 
 %AllObjectiveFunction = {'square underdosing','square overdosing','square deviation', 'mean', 'EUD',...
 %                        'min dose constraint','max dose constraint',...
@@ -1632,11 +1632,11 @@ columnname = {'VOI name','VOI type','priority','TMD levels'};
 %                        'max DVH constraint','min DVH constraint',...
 %                        'max DVH objective' ,'min DVH objective'};
 
-columnformat = {cst(:,2)',{'OAR','TARGET'},'numeric','numeric'};
+columnformat = {cst(:,2)',{'OAR','TARGET'},'numeric','numeric','numeric'};
 
 %columnformatT = { 'numeric','numeric','numeric','numeric'};
    
-columneditable = [true true true false];
+columneditable = [true true true true false];
 
 %columneditableT = [true true true true];
    
@@ -1664,8 +1664,11 @@ for i = 1:size(cst,1)
            data{Counter,1}  = cst{i,2};
            %VOI Type
            data{Counter,2}  = cst{i,3};
+           %Dose Gy prescribed to structure
+           data{Counter,3}  = cst{i,6}.dose;
+           
            %Priority
-           data{Counter,3}  = cst{i,5}.Priority;
+           data{Counter,4}  = cst{i,5}.Priority;
 
            nLevel = 0;
            
@@ -1674,7 +1677,7 @@ for i = 1:size(cst,1)
                nLevel = numel(cst{i,6}.TMDArray);
            end
                  
-           data{Counter,4}  = nLevel;
+           data{Counter,5}  = nLevel;
 
            
            %Objective Function
@@ -1734,11 +1737,19 @@ for i = 1:size(OldCst,1)
                 else
                     NewCst{Cnt,2}=data{j,2};
                 end
-                %Priority
+                %Dose(Gy) Desired
                 if isempty(data{j,3})
                     FlagValidParameters=false;
                 else
                     NewCst{Cnt,3}=data{j,3};
+                end
+                
+                
+                %Priority
+                if isempty(data{j,4})
+                    FlagValidParameters=false;
+                else
+                    NewCst{Cnt,4}=data{j,4};
                 end
             end
             
@@ -1752,12 +1763,9 @@ for i = 1:size(OldCst,1)
            %      NewCst{Cnt,4}(CntObjF,1).type = data{j,4};
            % end
          
-            nLevel =  get(handles.popupmenuTMLevel,'Value' );
-           
-            columnname = get(handles.uiTable,'ColumnName');
-            
-            tmdarray = data(j,:);
-            
+%            nLevel =  get(handles.popupmenuTMLevel,'Value' );
+%           
+     
             % get further parameter
 %             if FlagValidParameters
 %                 
@@ -1769,14 +1777,12 @@ for i = 1:size(OldCst,1)
 %              
 %             end
             
-            if FlagValidParameters
+%            if FlagValidParameters
               %Only save the Truncated Mean Dose related values  
-              NewCst{Cnt,4}(CntObjF,1).TMLevel     = nLevel ;
-              NewCst{Cnt,4}(CntObjF,1).TMDLabel    = columnname(4:numel(columnname));
-              NewCst{Cnt,4}(CntObjF,1).TMDArray    = tmdarray(4:numel(tmdarray));
-           
-             
-            end
+%              NewCst{Cnt,5}(CntObjF,1).TMLevel     = nLevel ;
+%              NewCst{Cnt,5}(CntObjF,1).TMDLabel    = columnname(4:numel(columnname));
+%              NewCst{Cnt,5}(CntObjF,1).TMDArray    = tmdarray(4:numel(tmdarray));         
+%            end
             
             
             
@@ -1807,9 +1813,10 @@ if FlagValidParameters
                if strcmp(VOIexist,VOIGUI)
                   % overite existing objectives
                    boolChanged = true;
-                   OldCst(m,6) = NewCst(n,4);
+          
                    OldCst(m,3) = NewCst(n,2);
-                   OldCst{m,5}.Priority = NewCst{n,3};
+                   OldCst{m,6}.dose = NewCst{n,3};
+                   OldCst{m,5}.Priority = NewCst{n,4};
                    break;
                end 
            end
@@ -2556,7 +2563,9 @@ cst = evalin('base','cst');
 for i = 1:size(cst,1)
     cst{i,5}.Visible = handles.VOIPlotFlag(i);
 end
+
 matRad_calcDVH(resultGUI_SelectedCube,cst,evalin('base','pln'));
+%matRad_IntuitiveOpt_calcDVH(resultGUI_SelectedCube,cst,evalin('base','pln'));
 
 % radio button: plot isolines labels
 function radiobtnIsoDoseLinesLabels_Callback(~, ~, handles)

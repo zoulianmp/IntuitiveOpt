@@ -4,4 +4,6 @@
 % affect global intOptParameters
 
 
-fineTuneTMDArrayTG119;
+%fineTuneTMDArrayTG119;
+
+fineTuneTMDArrayPROSTATE;

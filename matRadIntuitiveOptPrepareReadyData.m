@@ -22,14 +22,14 @@ clc
 % load patient data, i.e. ct, voi, cst
 
 %load HEAD_AND_NECK.mat
-load TG119.mat
-%load PROSTATE.mat
+%load TG119.mat
+load PROSTATE.mat
 %load LIVER.mat
 %load BOXPHANTOM.mat
 
 % meta information for treatment plan
 pln.isoCenter       = matRad_getIsoCenter(cst,ct,0);
-pln.bixelWidth      = 5; % [mm] / also corresponds to lateral spot spacing for particles
+pln.bixelWidth      = 10; % [mm] / also corresponds to lateral spot spacing for particles
 pln.gantryAngles    = [0:72:359]; % [°]
 pln.couchAngles     = [0 0 0 0 0]; % [°]
 pln.numOfBeams      = numel(pln.gantryAngles);
@@ -39,7 +39,7 @@ pln.radiationMode   = 'photons'; % either photons / protons / carbon
 pln.bioOptimization = 'none'; % none: physical optimization; effect: effect-based optimization; RBExD: optimization of RBE-weighted dose
 pln.numOfFractions  = 30;
 pln.runSequencing   = false; % 1/true: run sequencing, 0/false: don't / will be ignored for particles and also triggered by runDAO below
-pln.runDAO          = true; % 1/true: run DAO, 0/false: don't / will be ignored for particles
+pln.runDAO          = false; % 1/true: run DAO, 0/false: don't / will be ignored for particles
 pln.machine         = 'Generic';
 
 % Add new MLC Structure
@@ -94,8 +94,8 @@ end
  else
 
     %save HEAD_AND_NECK_intopt_ready.mat cst ct dij pln stf
-    save TG119_intopt_ready.mat cst ct dij pln stf
-    %save PROSTATE_intopt_ready.mat cst ct dij pln stf
+    %save TG119_intopt_ready.mat cst ct dij pln stf
+    save PROSTATE_intopt_ready.mat cst ct dij pln stf
     %save LIVER_intopt_ready.mat cst ct dij pln stf
     %save BOXPHANTOM_intopt_ready.mat cst ct dij pln stf
 

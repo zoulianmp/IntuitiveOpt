@@ -119,7 +119,9 @@ set(table,'units','normalized')
 set(table,'position',pos)
 
 % get quality indicators and fill table
-res = matRad_calcQualityIndicators(result,cst,pln);
+%res = matRad_calcQualityIndicators(result,cst,pln); commented by zoulian
+
+res = matRad_IntuitiveOpt_calcQualityIndicators(result,cst,pln);
 
 set(table,'ColumnName',fieldnames(res.QI));
 set(table,'Data',(squeeze(struct2cell(res.QI)))');

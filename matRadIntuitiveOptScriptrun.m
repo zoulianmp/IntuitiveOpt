@@ -30,10 +30,10 @@ fprintf('Beging load Base Data .....\n');
 
 %load HEAD_AND_NECK_intopt.mat
 
-load TG119_intopt_ready.mat
+%load TG119_intopt_ready.mat
 
 
-%load PROSTATE_intopt.mat
+load PROSTATE_intopt_ready.mat
 %load LIVER_intopt.mat
 %load BOXPHANTOM_intopt.mat
 
