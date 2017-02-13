@@ -2713,6 +2713,10 @@ getPlnFromGUI(handles);
 function btnSetIsoDoseLevels_Callback(hObject, ~, handles)
 prompt = {['Enter iso dose levels in [Gy]. Enter space-separated numbers, e.g. 1.5 2 3 4.98. Enter 0 to use default values']};
 def = {'1 2 3 4 5 10 20'};
+if numel(handles.IsoDose.Levels) > 0
+    def = {num2str(handles.IsoDose.Levels)};
+end
+
 try
 Input = inputdlg(prompt,'Set iso dose levels ', [1 50],def);
 if ~isempty(Input)
@@ -2726,6 +2730,7 @@ catch
     warning('Couldnt parse iso dose levels - using default values');
     handles.IsoDose.Levels = 0;
 end
+%take effect the iso lines
 handles = updateIsoDoseLineCache(handles);
 UpdatePlot(handles);
 guidata(hObject,handles);
@@ -3161,8 +3166,6 @@ elseif strcmp(handles.SelectedDisplayOption,'RBETruncated10Perc')
 else
     dose = resultGUI.(handles.SelectedDisplayOption);
 end
-
-
 
 
 handles.maxDoseVal = max(dose(:));
