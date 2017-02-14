@@ -3169,7 +3169,12 @@ end
 
 
 handles.maxDoseVal = max(dose(:));
-handles            = getIsoDoseLevels(handles);
+
+%ensure there are ISODoseLevels
+if ~numel(handles.IsoDose.Levels) >1
+    handles  = getIsoDoseLevels(handles);
+end
+
 set(handles.txtMaxDoseVal,'String',num2str(handles.maxDoseVal))
  
 
@@ -4112,6 +4117,7 @@ function resumeOpt_pushbutton_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 global intOptResultGUI
+global intOptParameters
 
 fprintf('Resume  cvx IntuitiveOpt .....\n');
 
@@ -4119,6 +4125,15 @@ fprintf('Resume  cvx IntuitiveOpt .....\n');
 dij = evalin('base','dij');
 cst = evalin('base','cst');
 pln = evalin('base','pln');
+
+
+fprintf('Update cvx intOptParameters .....\n');
+
+%get the intOpt Parameters
+intOptParameters = getIntuitiveOptParameters(cst,dij);
+
+
+fprintf('Beging cvx IntuitiveOpt .....\n');
 
 resultGUI = matRad_IntuitiveOptFluenceOptimization(dij,cst,pln);
 intOptResultGUI = resultGUI;

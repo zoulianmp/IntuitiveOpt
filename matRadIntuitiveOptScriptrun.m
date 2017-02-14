@@ -43,6 +43,7 @@ fprintf('End load Base Data \n');
 % fine tune the TMDArray for structures in the intuitive Optimization
 fineTuneTMDArrayForIntuitiveOpt;
 
+fprintf('Update cvx intOptParameters .....\n');
 
 %get the intOpt Parameters
 intOptParameters = getIntuitiveOptParameters(cst,dij);

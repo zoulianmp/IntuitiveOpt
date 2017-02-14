@@ -15,7 +15,11 @@ function [resultIntuitiveOptGUI,infoIntuitiveOpt] = matRad_IntuitiveOptFluenceOp
 %                           biological optimization) RBE-weighted dose etc.
 %   infoIntuitiveOpt:       struct containing information about optimization
 %
-% References
+% Function:
+% 1, Using the global variable intOptParameters, generate the cvx opt scripts
+% 2, call cvx_opt_fluence_phase1, 
+% 3, call cvx_opt_fluence_phase2;
+% 4, return the Opt result;
 %   -
 %
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
